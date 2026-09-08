@@ -6,16 +6,17 @@ import {
   updateProject,
   deleteProject
 } from '../controllers/projectController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .post(createProject)
+  .post(protect, createProject)
   .get(getProjects);
 
 router.route('/:id')
   .get(getProjectById)
-  .put(updateProject)
-  .delete(deleteProject);
+  .put(protect, updateProject)
+  .delete(protect, deleteProject);
 
 export default router;

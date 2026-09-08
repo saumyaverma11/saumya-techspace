@@ -11,6 +11,7 @@ import educationRoutes from './routes/educationRoutes.js';
 import certificationRoutes from './routes/certificationRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use('/api/education', educationRoutes);
 app.use('/api/certifications', certificationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

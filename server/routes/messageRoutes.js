@@ -6,17 +6,18 @@ import {
   markMessageAsRead,
   deleteMessage
 } from '../controllers/messageController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
   .post(createMessage)
-  .get(getMessages);
+  .get(protect, getMessages);
 
 router.route('/:id')
-  .get(getMessageById)
-  .delete(deleteMessage);
+  .get(protect, getMessageById)
+  .delete(protect, deleteMessage);
 
-router.put('/:id/read', markMessageAsRead);
+router.put('/:id/read', protect, markMessageAsRead);
 
 export default router;

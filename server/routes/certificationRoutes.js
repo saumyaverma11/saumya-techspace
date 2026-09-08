@@ -6,16 +6,17 @@ import {
   updateCertification,
   deleteCertification
 } from '../controllers/certificationController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .post(createCertification)
+  .post(protect, createCertification)
   .get(getCertifications);
 
 router.route('/:id')
   .get(getCertificationById)
-  .put(updateCertification)
-  .delete(deleteCertification);
+  .put(protect, updateCertification)
+  .delete(protect, deleteCertification);
 
 export default router;

@@ -6,16 +6,17 @@ import {
   updateSkill,
   deleteSkill
 } from '../controllers/skillController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .post(createSkill)
+  .post(protect, createSkill)
   .get(getSkills);
 
 router.route('/:id')
   .get(getSkillById)
-  .put(updateSkill)
-  .delete(deleteSkill);
+  .put(protect, updateSkill)
+  .delete(protect, deleteSkill);
 
 export default router;

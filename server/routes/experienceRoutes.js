@@ -6,16 +6,17 @@ import {
   updateExperience,
   deleteExperience
 } from '../controllers/experienceController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .post(createExperience)
+  .post(protect, createExperience)
   .get(getExperiences);
 
 router.route('/:id')
   .get(getExperienceById)
-  .put(updateExperience)
-  .delete(deleteExperience);
+  .put(protect, updateExperience)
+  .delete(protect, deleteExperience);
 
 export default router;

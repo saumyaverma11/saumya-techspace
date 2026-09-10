@@ -1,31 +1,31 @@
-function Footer() {
+function Footer({ profile }) {
+  const brandName = profile?.name ? profile.name.split(' ')[0] : 'Saumya';
+  const fullName = profile?.name || 'Saumya Verma';
+  const title = profile?.title || 'Junior Software Engineer and Full-Stack Developer';
+  const githubUrl = profile?.githubUrl || '#';
+  const linkedinUrl = profile?.linkedinUrl || '#';
+  const email = profile?.email ? `mailto:${profile.email}` : 'mailto:yourmail@example.com';
+
   return (
     <footer className="border-t border-white/10 bg-slate-950 text-white">
-
       <div className="mx-auto max-w-7xl px-5 py-12 md:px-8">
-
         {/* Main Footer */}
         <div className="grid gap-10 md:grid-cols-3">
-
           {/* Brand */}
           <div>
-            <a
-              href="#home"
-              className="text-2xl font-bold"
-            >
-              Saumya<span className="text-cyan-400">.</span>
+            <a href="#home" className="text-2xl font-bold">
+              {brandName}
+              <span className="text-cyan-400">.</span>
             </a>
 
             <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
-              Junior Software Engineer and Full-Stack Developer passionate
-              about building modern, scalable and user-friendly applications.
+              {title} passionate about building modern, scalable and user-friendly applications.
             </p>
 
             <p className="mt-4 text-sm text-cyan-400">
               Let's build something great together.
             </p>
           </div>
-
 
           {/* Quick Links */}
           <div>
@@ -34,66 +34,32 @@ function Footer() {
             </h3>
 
             <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
-
-              <a
-                href="#home"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#home" className="text-slate-400 transition hover:text-cyan-400">
                 Home
               </a>
-
-              <a
-                href="#about"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#about" className="text-slate-400 transition hover:text-cyan-400">
                 About
               </a>
-
-              <a
-                href="#skills"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#skills" className="text-slate-400 transition hover:text-cyan-400">
                 Skills
               </a>
-
-              <a
-                href="#projects"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#projects" className="text-slate-400 transition hover:text-cyan-400">
                 Projects
               </a>
-
-              <a
-                href="#experience"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#experience" className="text-slate-400 transition hover:text-cyan-400">
                 Experience
               </a>
-
-              <a
-                href="#education"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#education" className="text-slate-400 transition hover:text-cyan-400">
                 Education
               </a>
-
-              <a
-                href="#certifications"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#certifications" className="text-slate-400 transition hover:text-cyan-400">
                 Certifications
               </a>
-
-              <a
-                href="#contact"
-                className="text-slate-400 transition hover:text-cyan-400"
-              >
+              <a href="#contact" className="text-slate-400 transition hover:text-cyan-400">
                 Contact
               </a>
-
             </div>
           </div>
-
 
           {/* Connect */}
           <div>
@@ -102,15 +68,13 @@ function Footer() {
             </h3>
 
             <p className="mt-5 text-sm leading-6 text-slate-400">
-              Interested in working together or have an opportunity?
-              Feel free to reach out.
+              Interested in working together or have an opportunity? Feel free to reach out.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
-
               <a
-                href="#"
-                target="_blank"
+                href={githubUrl}
+                target={githubUrl !== '#' ? '_blank' : undefined}
                 rel="noreferrer"
                 className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-cyan-400 hover:text-cyan-400"
               >
@@ -118,8 +82,8 @@ function Footer() {
               </a>
 
               <a
-                href="#"
-                target="_blank"
+                href={linkedinUrl}
+                target={linkedinUrl !== '#' ? '_blank' : undefined}
                 rel="noreferrer"
                 className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-cyan-400 hover:text-cyan-400"
               >
@@ -127,42 +91,29 @@ function Footer() {
               </a>
 
               <a
-                href="mailto:yourmail@example.com"
+                href={email}
                 className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-cyan-400 hover:text-cyan-400"
               >
                 Email
               </a>
-
             </div>
           </div>
-
         </div>
-
 
         {/* Divider */}
         <div className="my-10 h-px bg-white/10" />
 
-
         {/* Bottom Footer */}
         <div className="flex flex-col gap-3 text-center text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:text-left">
+          <p>© {new Date().getFullYear()} {fullName}. All rights reserved.</p>
 
-          <p>
-            © {new Date().getFullYear()} Saumya Verma. All rights reserved.
-          </p>
-
-          <a
-            href="#home"
-            className="transition hover:text-cyan-400"
-          >
+          <a href="#home" className="transition hover:text-cyan-400">
             Back to top ↑
           </a>
-
         </div>
-
       </div>
-
     </footer>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

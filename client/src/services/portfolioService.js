@@ -98,6 +98,38 @@ export const portfolioService = {
   },
 
   /**
+   * Fetch single experience by ID
+   */
+  async getExperienceById(id) {
+    const res = await api.get(`/experience/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Create a new work experience record (protected)
+   */
+  async createExperience(experienceData) {
+    const res = await api.post('/experience', experienceData);
+    return res.data;
+  },
+
+  /**
+   * Update an existing work experience record by ID (protected)
+   */
+  async updateExperience(id, experienceData) {
+    const res = await api.put(`/experience/${id}`, experienceData);
+    return res.data;
+  },
+
+  /**
+   * Delete an experience record by ID (protected)
+   */
+  async deleteExperience(id) {
+    const res = await api.delete(`/experience/${id}`);
+    return res;
+  },
+
+  /**
    * Fetch all education records
    */
   async getEducation() {

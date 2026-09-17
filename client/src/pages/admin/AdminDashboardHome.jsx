@@ -168,7 +168,7 @@ export function AdminDashboardHome() {
     {
       title: 'Experience',
       metric: metrics.experience,
-      link: '/admin/dashboard/experience',
+      link: '/admin/experience',
       color: 'from-amber-500/20 to-orange-500/20',
       iconColor: 'text-amber-400',
       icon: (

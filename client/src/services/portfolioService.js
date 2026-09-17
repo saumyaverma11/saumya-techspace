@@ -241,6 +241,46 @@ export const portfolioService = {
     const res = await api.get('/messages');
     return res.data || [];
   },
+
+  /**
+   * Fetch single message by ID (protected admin endpoint)
+   */
+  async getMessageById(id) {
+    const res = await api.get(`/messages/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Mark message as read by ID (protected admin endpoint)
+   */
+  async markMessageAsRead(id) {
+    const res = await api.put(`/messages/${id}/read`, {});
+    return res.data;
+  },
+
+  /**
+   * Delete message by ID (protected admin endpoint)
+   */
+  async deleteMessage(id) {
+    const res = await api.delete(`/messages/${id}`);
+    return res;
+  },
+
+  /**
+   * Fetch complete analytics records and counts (protected admin endpoint)
+   */
+  async getAnalytics() {
+    const res = await api.get('/analytics');
+    return res.data;
+  },
+
+  /**
+   * Fetch analytics summary metrics (protected admin endpoint)
+   */
+  async getAnalyticsSummary() {
+    const res = await api.get('/analytics/summary');
+    return res.data;
+  },
 };
 
 export default portfolioService;

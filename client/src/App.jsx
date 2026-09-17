@@ -23,6 +23,8 @@ import AdminExperience from './pages/admin/AdminExperience';
 import AdminEducation from './pages/admin/AdminEducation';
 import AdminCertifications from './pages/admin/AdminCertifications';
 import AdminProfile from './pages/admin/AdminProfile';
+import AdminMessages from './pages/admin/AdminMessages';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminPlaceholder from './pages/admin/AdminPlaceholder';
 import portfolioService from './services/portfolioService';
 import './App.css';
@@ -104,6 +106,10 @@ function App() {
               <Route path="dashboard/certifications" element={<Navigate to="/admin/certifications" replace />} />
               <Route path="profile" element={<AdminProfile />} />
               <Route path="dashboard/profile" element={<Navigate to="/admin/profile" replace />} />
+              <Route path="messages" element={<AdminMessages />} />
+              <Route path="dashboard/messages" element={<Navigate to="/admin/messages" replace />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="dashboard/analytics" element={<Navigate to="/admin/analytics" replace />} />
               <Route path="dashboard/:section" element={<AdminPlaceholder />} />
               <Route path=":section" element={<AdminPlaceholder />} />
               <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

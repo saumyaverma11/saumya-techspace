@@ -115,7 +115,7 @@ export function AdminLayout() {
     },
     {
       name: 'Messages',
-      path: '/admin/dashboard/messages',
+      path: '/admin/messages',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
@@ -129,7 +129,7 @@ export function AdminLayout() {
     },
     {
       name: 'Analytics',
-      path: '/admin/dashboard/analytics',
+      path: '/admin/analytics',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path

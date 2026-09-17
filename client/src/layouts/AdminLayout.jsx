@@ -101,7 +101,7 @@ export function AdminLayout() {
     },
     {
       name: 'Profile',
-      path: '/admin/dashboard/profile',
+      path: '/admin/profile',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path

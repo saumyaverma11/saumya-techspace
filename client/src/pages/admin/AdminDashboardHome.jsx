@@ -337,11 +337,22 @@ export function AdminDashboardHome() {
       </div>
 
       {/* Fast Shortcuts / Status Footer */}
-      <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-6">
-        <h3 className="text-sm font-semibold text-white">Phase 14 Foundation Status</h3>
-        <p className="mt-1 text-xs text-slate-400">
-          Admin authentication, session guard, and dashboard foundation are operational. Management screens for CRUD modules can be populated in upcoming phases.
-        </p>
+      <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-slate-900/40 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-sm font-semibold text-white">Profile & Branding</h3>
+          <p className="mt-1 text-xs text-slate-400">
+            Keep your bio, about details, contact information, resume, and public social handles up to date.
+          </p>
+        </div>
+        <Link
+          to="/admin/profile"
+          className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-400/20"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span>Edit Profile</span>
+        </Link>
       </div>
     </div>
   );

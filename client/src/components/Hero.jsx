@@ -10,6 +10,8 @@ function Hero({ profile }) {
   const avatar = profile?.avatar || picture;
   const githubUrl = profile?.githubUrl || '#';
   const linkedinUrl = profile?.linkedinUrl || '#';
+  const twitterUrl = profile?.twitterUrl || '';
+  const resumeUrl = profile?.resumeUrl || '';
   const email = profile?.email ? `mailto:${profile.email}` : 'mailto:yourmail@example.com';
 
   return (
@@ -45,6 +47,17 @@ function Hero({ profile }) {
               View My Work
             </a>
 
+            {resumeUrl ? (
+              <a
+                href={resumeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full rounded-full border border-slate-600 px-7 py-3 text-center font-semibold text-white transition duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:text-cyan-400 sm:w-auto"
+              >
+                Resume
+              </a>
+            ) : null}
+
             <a
               href="#contact"
               className="w-full rounded-full border border-slate-600 px-7 py-3 text-center font-semibold text-white transition duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:text-cyan-400 sm:w-auto"
@@ -72,6 +85,17 @@ function Hero({ profile }) {
             >
               LinkedIn
             </a>
+
+            {twitterUrl && twitterUrl !== '#' ? (
+              <a
+                href={twitterUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="transition hover:text-cyan-400"
+              >
+                Twitter / X
+              </a>
+            ) : null}
 
             <a href={email} className="transition hover:text-cyan-400">
               Email

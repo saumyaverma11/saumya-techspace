@@ -10,6 +10,14 @@ export const portfolioService = {
   },
 
   /**
+   * Update portfolio profile information (protected)
+   */
+  async updateProfile(profileData) {
+    const res = await api.put('/profile', profileData);
+    return res.data;
+  },
+
+  /**
    * Fetch all portfolio projects
    */
   async getProjects() {

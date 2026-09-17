@@ -22,6 +22,7 @@ import AdminSkills from './pages/admin/AdminSkills';
 import AdminExperience from './pages/admin/AdminExperience';
 import AdminEducation from './pages/admin/AdminEducation';
 import AdminCertifications from './pages/admin/AdminCertifications';
+import AdminProfile from './pages/admin/AdminProfile';
 import AdminPlaceholder from './pages/admin/AdminPlaceholder';
 import portfolioService from './services/portfolioService';
 import './App.css';
@@ -101,6 +102,8 @@ function App() {
               <Route path="dashboard/education" element={<Navigate to="/admin/education" replace />} />
               <Route path="certifications" element={<AdminCertifications />} />
               <Route path="dashboard/certifications" element={<Navigate to="/admin/certifications" replace />} />
+              <Route path="profile" element={<AdminProfile />} />
+              <Route path="dashboard/profile" element={<Navigate to="/admin/profile" replace />} />
               <Route path="dashboard/:section" element={<AdminPlaceholder />} />
               <Route path=":section" element={<AdminPlaceholder />} />
               <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

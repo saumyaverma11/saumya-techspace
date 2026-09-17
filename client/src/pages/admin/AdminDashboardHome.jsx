@@ -202,7 +202,7 @@ export function AdminDashboardHome() {
     {
       title: 'Certifications',
       metric: metrics.certifications,
-      link: '/admin/dashboard/certifications',
+      link: '/admin/certifications',
       color: 'from-pink-500/20 to-rose-500/20',
       iconColor: 'text-pink-400',
       icon: (

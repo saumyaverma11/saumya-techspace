@@ -87,7 +87,7 @@ export function AdminLayout() {
     },
     {
       name: 'Certifications',
-      path: '/admin/dashboard/certifications',
+      path: '/admin/certifications',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path

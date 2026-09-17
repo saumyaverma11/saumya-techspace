@@ -178,6 +178,38 @@ export const portfolioService = {
   },
 
   /**
+   * Fetch single certification record by ID
+   */
+  async getCertificationById(id) {
+    const res = await api.get(`/certifications/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Create a new certification record (protected)
+   */
+  async createCertification(certificationData) {
+    const res = await api.post('/certifications', certificationData);
+    return res.data;
+  },
+
+  /**
+   * Update an existing certification record by ID (protected)
+   */
+  async updateCertification(id, certificationData) {
+    const res = await api.put(`/certifications/${id}`, certificationData);
+    return res.data;
+  },
+
+  /**
+   * Delete a certification record by ID (protected)
+   */
+  async deleteCertification(id) {
+    const res = await api.delete(`/certifications/${id}`);
+    return res;
+  },
+
+  /**
    * Submit a contact form message
    * @param {{ name: string, email: string, subject: string, message: string }} payload
    */

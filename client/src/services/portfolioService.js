@@ -138,6 +138,38 @@ export const portfolioService = {
   },
 
   /**
+   * Fetch single education record by ID
+   */
+  async getEducationById(id) {
+    const res = await api.get(`/education/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Create a new education record (protected)
+   */
+  async createEducation(educationData) {
+    const res = await api.post('/education', educationData);
+    return res.data;
+  },
+
+  /**
+   * Update an existing education record by ID (protected)
+   */
+  async updateEducation(id, educationData) {
+    const res = await api.put(`/education/${id}`, educationData);
+    return res.data;
+  },
+
+  /**
+   * Delete an education record by ID (protected)
+   */
+  async deleteEducation(id) {
+    const res = await api.delete(`/education/${id}`);
+    return res;
+  },
+
+  /**
    * Fetch all certifications
    */
   async getCertifications() {

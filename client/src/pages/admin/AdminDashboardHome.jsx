@@ -185,7 +185,7 @@ export function AdminDashboardHome() {
     {
       title: 'Education',
       metric: metrics.education,
-      link: '/admin/dashboard/education',
+      link: '/admin/education',
       color: 'from-purple-500/20 to-indigo-500/20',
       iconColor: 'text-purple-400',
       icon: (

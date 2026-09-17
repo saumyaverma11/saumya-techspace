@@ -73,7 +73,7 @@ export function AdminLayout() {
     },
     {
       name: 'Education',
-      path: '/admin/dashboard/education',
+      path: '/admin/education',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path

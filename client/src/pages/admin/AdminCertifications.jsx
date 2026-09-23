@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import portfolioService from '../../services/portfolioService';
+import FileUpload from '../../components/admin/FileUpload';
 
 function formatIssueDateDisplay(dateStr) {
   if (!dateStr) return '';
@@ -10,6 +11,7 @@ function formatIssueDateDisplay(dateStr) {
 
 function isValidUrl(string) {
   if (!string) return true;
+  if (string.startsWith('/uploads/')) return true;
   try {
     const url = new URL(string);
     return url.protocol === 'http:' || url.protocol === 'https:';
@@ -35,6 +37,7 @@ export function AdminCertifications() {
     issueDate: '',
     credentialId: '',
     credentialUrl: '',
+    image: '',
     description: '',
     order: 0,
   });
@@ -123,6 +126,7 @@ export function AdminCertifications() {
       issueDate: '',
       credentialId: '',
       credentialUrl: '',
+      image: '',
       description: '',
       order:
         certifications.length > 0
@@ -142,6 +146,7 @@ export function AdminCertifications() {
       issueDate: item.issueDate || '',
       credentialId: item.credentialId || '',
       credentialUrl: item.credentialUrl || '',
+      image: item.image || '',
       description: item.description || '',
       order: typeof item.order === 'number' ? item.order : 0,
     });
@@ -165,6 +170,10 @@ export function AdminCertifications() {
       errors.credentialUrl = 'Please enter a valid URL (starting with http:// or https://).';
     }
 
+    if (formData.image.trim() && !isValidUrl(formData.image.trim())) {
+      errors.image = 'Please enter a valid image URL.';
+    }
+
     if (isNaN(Number(formData.order))) {
       errors.order = 'Display order must be a valid number.';
     }
@@ -186,6 +195,7 @@ export function AdminCertifications() {
         issueDate: formData.issueDate.trim(),
         credentialId: formData.credentialId.trim(),
         credentialUrl: formData.credentialUrl.trim(),
+        image: formData.image.trim(),
         description: formData.description.trim(),
         order: Number(formData.order) || 0,
       };
@@ -539,6 +549,20 @@ export function AdminCertifications() {
                     )}
                   </div>
 
+                  {/* Certificate Image Thumbnail */}
+                  {item.image && (
+                    <div className="mt-3 overflow-hidden rounded-xl border border-white/10 bg-slate-950">
+                      <img
+                        src={item.image}
+                        alt={certName}
+                        className="h-28 w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+
                   {/* Description */}
                   {item.description && (
                     <p className="mt-4 line-clamp-4 text-xs leading-relaxed text-slate-300">
@@ -774,6 +798,23 @@ export function AdminCertifications() {
                   )}
                   <p className="mt-1 text-[11px] text-slate-500">Lower numbers appear first.</p>
                 </div>
+              </div>
+
+              {/* Certificate Image Upload */}
+              <div>
+                <FileUpload
+                  id="certification-form-image"
+                  label="Certificate Image / Badge (JPG, PNG, WEBP — max 5MB)"
+                  type="certification"
+                  value={formData.image}
+                  onChange={(val) => {
+                    setFormData({ ...formData, image: val });
+                    if (formErrors.image) setFormErrors({ ...formErrors, image: null });
+                  }}
+                  error={formErrors.image}
+                  placeholder="https://... or click Upload Image"
+                  helperText="Optional uploaded certificate preview image or badge."
+                />
               </div>
 
               {/* Description */}

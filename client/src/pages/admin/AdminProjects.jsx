@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import portfolioService from '../../services/portfolioService';
+import FileUpload from '../../components/admin/FileUpload';
 
 const DEFAULT_CATEGORIES = [
   'Full Stack',
@@ -188,7 +189,7 @@ export function AdminProjects() {
     if (formData.liveUrl.trim() && !urlRegex.test(formData.liveUrl.trim())) {
       errors.liveUrl = 'Please enter a valid Live Demo URL.';
     }
-    if (formData.image.trim() && !urlRegex.test(formData.image.trim())) {
+    if (formData.image.trim() && !formData.image.trim().startsWith('/uploads/') && !urlRegex.test(formData.image.trim())) {
       errors.image = 'Please enter a valid image URL.';
     }
 
@@ -779,41 +780,21 @@ export function AdminProjects() {
                 )}
               </div>
 
-              {/* Image URL & Live Preview */}
+              {/* Image Upload & Preview */}
               <div>
-                <label htmlFor="modalImage" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                  Image URL
-                </label>
-                <input
+                <FileUpload
                   id="modalImage"
-                  type="url"
+                  label="Project Screenshot / Cover Image (JPG, PNG, WEBP — max 5MB)"
+                  type="project"
                   value={formData.image}
-                  onChange={(e) => {
-                    setFormData((prev) => ({ ...prev, image: e.target.value }));
+                  onChange={(val) => {
+                    setFormData((prev) => ({ ...prev, image: val }));
                     if (formErrors.image) setFormErrors((prev) => ({ ...prev, image: null }));
                   }}
-                  placeholder="https://images.unsplash.com/... or /assets/pic.jpg"
-                  className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
+                  error={formErrors.image}
+                  placeholder="https://... or click Upload Image"
+                  helperText="Showcase image for this project. Displayed on public project cards and modal previews."
                 />
-                {formErrors.image && <p className="mt-1 text-xs text-red-400">{formErrors.image}</p>}
-
-                {/* Small Image Preview */}
-                {formData.image && (
-                  <div className="mt-3 flex items-center gap-4 rounded-xl border border-white/10 bg-slate-950 p-3">
-                    <img
-                      src={formData.image}
-                      alt="Preview"
-                      className="h-16 w-24 rounded-lg object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                    <div className="text-xs text-slate-400">
-                      <p className="font-semibold text-slate-200">Image Preview</p>
-                      <p className="truncate max-w-xs">{formData.image}</p>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* GitHub and Live Demo Links */}

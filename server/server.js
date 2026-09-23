@@ -1,5 +1,5 @@
+import 'dotenv/config';
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import healthRoutes from './routes/healthRoutes.js';
@@ -10,10 +10,21 @@ import experienceRoutes from './routes/experienceRoutes.js';
 import educationRoutes from './routes/educationRoutes.js';
 import certificationRoutes from './routes/certificationRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import resumeRequestRoutes from './routes/resumeRequestRoutes.js';
 
-dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -44,6 +55,11 @@ app.use('/api/certifications', certificationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/resume-requests', resumeRequestRoutes);
+
+// Serve local uploads statically for development fallback
+app.use('/uploads', express.static(uploadsDir));
 
 app.use((req, res) => {
   res.status(404).json({

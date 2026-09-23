@@ -141,17 +141,31 @@ export function AdminLayout() {
         </svg>
       ),
     },
+    {
+      name: 'Resume Requests',
+      path: '/admin/resume-requests',
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.8}
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+      ),
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-100 selection:bg-cyan-400/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-200 selection:bg-blue-500/20 selection:text-blue-700 dark:bg-[#0B1220] dark:text-slate-100 dark:selection:bg-cyan-400/30 dark:selection:text-cyan-200">
       {/* Mobile Top Navigation Header */}
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-white/10 bg-slate-950/80 px-4 backdrop-blur-md lg:hidden">
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur-md transition-colors duration-200 dark:border-white/10 dark:bg-[#0B1220]/90 lg:hidden">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="rounded-xl border border-white/10 p-2 text-slate-300 hover:bg-slate-900 focus:outline-none"
+            className="rounded-xl border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-100 focus:outline-none dark:border-white/10 dark:text-slate-300 dark:hover:bg-slate-900"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? (
@@ -165,24 +179,41 @@ export function AdminLayout() {
             )}
           </button>
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-400/10 font-bold text-cyan-400">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-blue-600/30 bg-blue-600/10 font-bold text-blue-600 dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-cyan-400">
               S
             </span>
-            <span className="font-semibold tracking-wide text-white">Saumya Admin</span>
+            <span className="font-semibold tracking-wide text-slate-900 dark:text-white">Saumya Admin</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Mobile Theme Toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-slate-100 text-slate-700 transition hover:bg-slate-200 dark:border-white/10 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+            aria-label="Toggle theme mode"
+          >
+            {isDark ? (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
           <Link
             to="/"
-            className="rounded-lg border border-white/10 px-2.5 py-1 text-xs font-medium text-slate-300 hover:bg-slate-900"
+            className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-slate-900"
           >
             View Site
           </Link>
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-lg bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400 hover:bg-red-500/20"
+            className="rounded-lg bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-500/20 dark:text-red-400"
           >
             Logout
           </button>
@@ -192,21 +223,21 @@ export function AdminLayout() {
       <div className="flex">
         {/* Desktop Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/10 bg-slate-950/95 backdrop-blur-xl transition-transform duration-300 lg:static lg:translate-x-0 ${
+          className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white/95 text-slate-800 backdrop-blur-xl transition-all duration-300 dark:border-white/10 dark:bg-[#0F172A]/95 dark:text-slate-100 lg:static lg:translate-x-0 ${
             mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
           {/* Brand Header */}
-          <div className="flex h-16 items-center justify-between border-b border-white/10 px-6">
+          <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6 transition-colors duration-200 dark:border-white/10">
             <Link to="/admin/dashboard" className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 font-bold text-cyan-400 shadow-sm shadow-cyan-400/20">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-600/30 bg-blue-600/10 font-bold text-blue-600 shadow-sm shadow-blue-500/10 transition-transform duration-200 hover:scale-105 dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-cyan-400 dark:shadow-cyan-400/20">
                 S
               </div>
               <div>
-                <span className="block text-sm font-bold tracking-tight text-white">
+                <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-white">
                   Saumya TechSpace
                 </span>
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-cyan-400">
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-cyan-400">
                   Control Center
                 </span>
               </div>
@@ -215,7 +246,7 @@ export function AdminLayout() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="rounded-lg p-1 text-slate-400 hover:text-white lg:hidden"
+              className="rounded-lg p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white lg:hidden"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -234,16 +265,18 @@ export function AdminLayout() {
                 className={({ isActive }) =>
                   `group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 shadow-sm shadow-cyan-400/10'
-                      : 'border border-transparent text-slate-400 hover:border-white/5 hover:bg-slate-900/60 hover:text-slate-200'
+                      ? 'border border-blue-500/30 bg-blue-50 text-blue-700 shadow-sm shadow-blue-500/5 dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-cyan-300 dark:shadow-cyan-400/10'
+                      : 'border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:border-white/5 dark:hover:bg-slate-900/60 dark:hover:text-slate-200'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     <span
-                      className={`transition-colors ${
-                        isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'
+                      className={`transition-all duration-200 group-hover:scale-110 ${
+                        isActive
+                          ? 'text-blue-600 dark:text-cyan-400'
+                          : 'text-slate-400 group-hover:text-slate-700 dark:text-slate-500 dark:group-hover:text-slate-300'
                       }`}
                     >
                       {item.icon}
@@ -256,16 +289,16 @@ export function AdminLayout() {
           </nav>
 
           {/* Admin User Info & Logout Button */}
-          <div className="border-t border-white/10 p-4">
-            <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/5 bg-slate-900/60 p-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-400/20 text-xs font-bold text-cyan-300">
+          <div className="border-t border-slate-200 p-4 transition-colors duration-200 dark:border-white/10">
+            <div className="mb-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-2.5 transition-colors duration-200 dark:border-white/5 dark:bg-slate-900/60">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600/10 text-xs font-bold text-blue-600 dark:bg-cyan-400/20 dark:text-cyan-300">
                 {(admin?.username || 'A')[0].toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold text-white">
+                <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">
                   {admin?.username || 'Administrator'}
                 </p>
-                <p className="truncate text-[11px] text-slate-400">
+                <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
                   {admin?.email || 'admin@domain'}
                 </p>
               </div>
@@ -274,7 +307,7 @@ export function AdminLayout() {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-500/20 hover:text-red-300 focus:outline-none"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-600 transition duration-200 hover:-translate-y-0.5 hover:bg-red-500/20 hover:text-red-700 active:translate-y-0 focus:outline-none dark:text-red-400 dark:hover:text-red-300"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -293,18 +326,18 @@ export function AdminLayout() {
         {mobileMenuOpen && (
           <div
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden"
           />
         )}
 
         {/* Main Content Area */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Desktop Top Header Bar */}
-          <header className="hidden h-16 items-center justify-between border-b border-white/10 bg-slate-950/50 px-8 backdrop-blur-md lg:flex">
+          <header className="hidden h-16 items-center justify-between border-b border-slate-200 bg-white/70 px-8 backdrop-blur-md transition-colors duration-200 dark:border-white/10 dark:bg-[#0B1220]/60 lg:flex">
             <div className="flex items-center gap-3">
-              <span className="text-xs uppercase tracking-[0.25em] text-slate-500">Workspace</span>
-              <span className="text-xs text-slate-600">/</span>
-              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400">
+              <span className="text-xs uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">Workspace</span>
+              <span className="text-xs text-slate-300 dark:text-slate-600">/</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-blue-600 dark:text-cyan-400">
                 Admin Console
               </span>
             </div>
@@ -312,7 +345,7 @@ export function AdminLayout() {
             <div className="flex items-center gap-4">
               <Link
                 to="/"
-                className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-slate-900/60 px-3.5 py-1.5 text-xs font-medium text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-300"
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-500/40 hover:text-blue-600 hover:shadow-md dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-cyan-400/40 dark:hover:text-cyan-300"
               >
                 <span>Live Portfolio</span>
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -328,7 +361,7 @@ export function AdminLayout() {
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-slate-900/60 text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-400"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 hover:border-blue-500/40 hover:text-blue-600 hover:rotate-12 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-cyan-400/40 dark:hover:text-cyan-400"
                 title={isDark ? 'Switch to Light' : 'Switch to Dark'}
                 aria-label="Toggle theme"
               >
@@ -356,7 +389,7 @@ export function AdminLayout() {
           </header>
 
           {/* Page Content View */}
-          <main className="flex-1 p-5 sm:p-8 lg:p-10">
+          <main className="admin-workspace flex-1 p-5 sm:p-8 lg:p-10 animate-fade-in">
             <Outlet />
           </main>
         </div>

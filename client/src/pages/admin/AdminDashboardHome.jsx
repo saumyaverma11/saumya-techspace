@@ -432,9 +432,9 @@ export function AdminDashboardHome() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       {/* 1. Welcome Banner Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-8 backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-white p-6 sm:p-8 shadow-sm backdrop-blur-xl transition-colors duration-200 dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
         <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -442,23 +442,23 @@ export function AdminDashboardHome() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 System Active
               </span>
             </div>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
               Welcome back, {admin?.username || 'Admin'}
             </h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
               Control center for managing your portfolio content, inquiries, and visitor intelligence.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             {lastRefreshed && (
-              <span className="hidden text-xs text-slate-400 lg:inline-block">
+              <span className="hidden text-xs text-slate-500 lg:inline-block dark:text-slate-400">
                 Last updated:{' '}
-                <span className="text-slate-200">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
                   {lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </span>
@@ -468,10 +468,10 @@ export function AdminDashboardHome() {
               type="button"
               onClick={fetchDashboardData}
               disabled={isRefreshing}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/80 px-4 py-2.5 text-xs font-semibold text-slate-200 backdrop-blur-md transition hover:border-cyan-400/40 hover:bg-slate-800 hover:text-cyan-300 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition-all hover:border-blue-500/40 hover:bg-slate-50 hover:text-blue-600 disabled:opacity-50 dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:border-cyan-400/40 dark:hover:bg-slate-800 dark:hover:text-cyan-300"
             >
               <svg
-                className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`}
+                className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-blue-600 dark:text-cyan-400' : ''}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -489,13 +489,13 @@ export function AdminDashboardHome() {
         </div>
 
         {/* Ambient background glow */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-[90px]" />
+        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/10 blur-[90px] dark:bg-cyan-500/10" />
       </div>
 
       {/* 2. Portfolio Overview Summary Cards Grid */}
       <div>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
             Portfolio Overview
           </h2>
           <span className="text-xs text-slate-500">Live Database Metrics</span>
@@ -505,17 +505,17 @@ export function AdminDashboardHome() {
           {summaryCards.map((card) => (
             <div
               key={card.title}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-cyan-400/40 hover:shadow-xl hover:shadow-cyan-400/5"
+              className="animate-dashboard-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/50 hover:shadow-md dark:border-white/10 dark:bg-slate-900/60 dark:hover:border-cyan-400/40 dark:hover:shadow-cyan-400/5"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br ${card.color} ${card.iconColor}`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200/80 bg-gradient-to-br ${card.color} ${card.iconColor} dark:border-white/10`}
                   >
                     {card.icon}
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-300">{card.title}</h3>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">{card.title}</h3>
                     <p className="text-xs text-slate-500">Total Entries</p>
                   </div>
                 </div>
@@ -523,7 +523,7 @@ export function AdminDashboardHome() {
                 {card.badge && (
                   <span
                     className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${
-                      card.badgeColor || 'border-cyan-400/30 bg-cyan-400/10 text-cyan-400'
+                      card.badgeColor || 'border-blue-500/30 bg-blue-50 text-blue-700 dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-cyan-400'
                     }`}
                   >
                     {card.badge}
@@ -533,18 +533,18 @@ export function AdminDashboardHome() {
 
               <div className="mt-6 flex items-baseline justify-between">
                 {card.metric.loading ? (
-                  <div className="h-8 w-16 animate-pulse rounded-lg bg-slate-800" />
+                  <div className="h-8 w-16 animate-pulse rounded-lg bg-slate-200 dark:bg-slate-800" />
                 ) : card.metric.error ? (
-                  <div className="text-xs font-medium text-amber-400">{card.metric.error}</div>
+                  <div className="text-xs font-medium text-amber-500 dark:text-amber-400">{card.metric.error}</div>
                 ) : (
-                  <span className="text-3xl font-extrabold tracking-tight text-white">
+                  <span className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     {card.metric.count}
                   </span>
                 )}
 
                 <Link
                   to={card.link}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 transition group-hover:text-cyan-400"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 transition group-hover:text-blue-600 dark:text-slate-400 dark:group-hover:text-cyan-400"
                 >
                   <span>Manage</span>
                   <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
@@ -557,7 +557,7 @@ export function AdminDashboardHome() {
 
       {/* 3. Quick Actions Hub */}
       <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
           Quick Actions
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
@@ -565,12 +565,12 @@ export function AdminDashboardHome() {
             <Link
               key={action.label}
               to={action.path}
-              className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-slate-900/60 p-3.5 text-center backdrop-blur-sm transition duration-200 hover:border-cyan-400/40 hover:bg-slate-800/80 hover:text-cyan-300"
+              className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white p-3.5 text-center shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-500/40 hover:bg-blue-50/40 hover:text-blue-600 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-cyan-400/40 dark:hover:bg-slate-800/80 dark:hover:text-cyan-300"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-slate-950 text-slate-400 transition group-hover:border-cyan-400/30 group-hover:bg-cyan-400/10 group-hover:text-cyan-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition group-hover:border-blue-500/30 group-hover:bg-blue-50 group-hover:text-blue-600 dark:border-white/10 dark:bg-slate-950 dark:text-slate-400 dark:group-hover:border-cyan-400/30 dark:group-hover:bg-cyan-400/10 dark:group-hover:text-cyan-300">
                 {action.icon}
               </div>
-              <span className="text-xs font-medium text-slate-300 group-hover:text-white">
+              <span className="text-xs font-medium text-slate-700 group-hover:text-blue-600 dark:text-slate-300 dark:group-hover:text-white">
                 {action.label}
               </span>
             </Link>
@@ -581,17 +581,17 @@ export function AdminDashboardHome() {
       {/* 4. Two-Column Activity & Intelligence Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column (2 Cols): Recent Inquiries */}
-        <div className="lg:col-span-2 rounded-3xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur-md">
-          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+        <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900/60 backdrop-blur-md">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
             <div>
-              <h2 className="text-base font-bold text-white">Recent Inquiries</h2>
-              <p className="text-xs text-slate-400">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Recent Inquiries</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Direct messages submitted via the public contact section
               </p>
             </div>
             <Link
               to="/admin/messages"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 transition hover:text-cyan-300"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-cyan-400 dark:hover:text-cyan-300"
             >
               <span>View All</span>
               <span>&rarr;</span>
@@ -602,16 +602,16 @@ export function AdminDashboardHome() {
             {messagesLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((n) => (
-                  <div key={n} className="h-16 w-full animate-pulse rounded-2xl bg-slate-950/60" />
+                  <div key={n} className="h-16 w-full animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-950/60" />
                 ))}
               </div>
             ) : messagesError ? (
-              <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-300">
+              <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-600 dark:text-red-300">
                 {messagesError}
               </div>
             ) : recentMessages.length === 0 ? (
               <div className="py-10 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-slate-950 text-slate-500">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-400 dark:border-white/10 dark:bg-slate-950 dark:text-slate-500">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       strokeLinecap="round"
@@ -621,7 +621,7 @@ export function AdminDashboardHome() {
                     />
                   </svg>
                 </div>
-                <h3 className="mt-3 text-sm font-semibold text-slate-300">No inquiries yet</h3>
+                <h3 className="mt-3 text-sm font-semibold text-slate-800 dark:text-slate-300">No inquiries yet</h3>
                 <p className="mt-1 text-xs text-slate-500">
                   Messages submitted by visitors will appear here in real time.
                 </p>
@@ -634,36 +634,36 @@ export function AdminDashboardHome() {
                     <Link
                       key={msg._id}
                       to="/admin/messages"
-                      className={`group block rounded-2xl border p-4 transition duration-200 hover:border-cyan-400/40 hover:bg-slate-800/60 ${
+                      className={`group block rounded-2xl border p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-sm ${
                         isUnread
-                          ? 'border-cyan-400/30 bg-cyan-400/5'
-                          : 'border-white/5 bg-slate-950/50'
+                          ? 'border-blue-500/30 bg-blue-50/40 hover:bg-blue-50/70 dark:border-cyan-400/30 dark:bg-cyan-400/5 dark:hover:bg-slate-800/60'
+                          : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 dark:border-white/5 dark:bg-slate-950/50 dark:hover:bg-slate-800/60'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="truncate text-xs font-bold text-white">
+                            <span className="truncate text-xs font-bold text-slate-900 dark:text-white">
                               {msg.name || 'Anonymous Visitor'}
                             </span>
-                            <span className="text-[11px] text-slate-500">&bull;</span>
-                            <span className="truncate text-[11px] text-slate-400">
+                            <span className="text-[11px] text-slate-400 dark:text-slate-500">&bull;</span>
+                            <span className="truncate text-[11px] text-slate-500 dark:text-slate-400">
                               {msg.email}
                             </span>
                             {isUnread && (
-                              <span className="rounded-md border border-cyan-400/40 bg-cyan-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-cyan-300">
+                              <span className="rounded-md border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 dark:border-cyan-400/40 dark:bg-cyan-400/10 dark:text-cyan-300">
                                 Unread
                               </span>
                             )}
                           </div>
-                          <p className="mt-1 truncate text-xs font-semibold text-slate-200">
+                          <p className="mt-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200">
                             {msg.subject || '(No Subject)'}
                           </p>
-                          <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">
+                          <p className="mt-0.5 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                             {msg.message}
                           </p>
                         </div>
-                        <span className="shrink-0 text-[11px] text-slate-500">
+                        <span className="shrink-0 text-[11px] text-slate-400 dark:text-slate-500">
                           {formatShortDate(msg.createdAt)}
                         </span>
                       </div>
@@ -678,29 +678,29 @@ export function AdminDashboardHome() {
         {/* Right Column (1 Col): Analytics Snapshot & Profile Quick Card */}
         <div className="space-y-6">
           {/* Analytics Snapshot Card */}
-          <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur-md">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900/60 backdrop-blur-md">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
               <div>
-                <h2 className="text-base font-bold text-white">Traffic Snapshot</h2>
-                <p className="text-xs text-slate-400">Portfolio visit intelligence</p>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Traffic Snapshot</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Portfolio visit intelligence</p>
               </div>
               <Link
                 to="/admin/analytics"
-                className="text-xs font-semibold text-cyan-400 hover:text-cyan-300"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-cyan-400 dark:hover:text-cyan-300"
               >
                 Details &rarr;
               </Link>
             </div>
 
             <div className="mt-4 space-y-4">
-              <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-slate-950/60 p-3.5">
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-3.5 dark:border-white/5 dark:bg-slate-950/60">
                 <div>
-                  <p className="text-xs text-slate-400">Total All-Time Visits</p>
-                  <p className="text-2xl font-extrabold text-white">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Total All-Time Visits</p>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
                     {metrics.analytics.loading ? '...' : metrics.analytics.count}
                   </p>
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-400">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-600/20 bg-blue-600/10 text-blue-600 dark:border-cyan-400/20 dark:bg-cyan-400/10 dark:text-cyan-400">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       strokeLinecap="round"
@@ -719,25 +719,25 @@ export function AdminDashboardHome() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-white/5 bg-slate-950/60 p-3">
-                  <p className="text-[11px] text-slate-400">Today's Traffic</p>
-                  <p className="mt-0.5 text-lg font-bold text-emerald-400">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-white/5 dark:bg-slate-950/60">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Today's Traffic</p>
+                  <p className="mt-0.5 text-lg font-bold text-emerald-600 dark:text-emerald-400">
                     {metrics.analytics.loading ? '...' : metrics.analytics.todayVisits}
                   </p>
-                  <p className="text-[10px] text-slate-500">recorded views</p>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500">recorded views</p>
                 </div>
-                <div className="rounded-2xl border border-white/5 bg-slate-950/60 p-3">
-                  <p className="text-[11px] text-slate-400">Active Days</p>
-                  <p className="mt-0.5 text-lg font-bold text-cyan-300">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-white/5 dark:bg-slate-950/60">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Active Days</p>
+                  <p className="mt-0.5 text-lg font-bold text-blue-600 dark:text-cyan-300">
                     {metrics.analytics.loading ? '...' : metrics.analytics.activeDays}
                   </p>
-                  <p className="text-[10px] text-slate-500">recorded days</p>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500">recorded days</p>
                 </div>
               </div>
 
               <Link
                 to="/admin/analytics"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 py-2.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-400/20"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-600/30 bg-blue-50 py-2.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-100/70 dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-cyan-300 dark:hover:bg-cyan-400/20"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -753,15 +753,15 @@ export function AdminDashboardHome() {
           </div>
 
           {/* Profile & Branding Quick Access */}
-          <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur-md">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900/60 backdrop-blur-md">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
               <div>
-                <h2 className="text-base font-bold text-white">Profile & Identity</h2>
-                <p className="text-xs text-slate-400">Public biography and branding</p>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Profile & Identity</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Public biography and branding</p>
               </div>
               <Link
                 to="/admin/profile"
-                className="text-xs font-semibold text-cyan-400 hover:text-cyan-300"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-cyan-400 dark:hover:text-cyan-300"
               >
                 Edit &rarr;
               </Link>
@@ -770,11 +770,11 @@ export function AdminDashboardHome() {
             <div className="mt-4">
               {profileLoading ? (
                 <div className="space-y-3 animate-pulse">
-                  <div className="h-10 w-full rounded-xl bg-slate-950/60" />
-                  <div className="h-14 w-full rounded-xl bg-slate-950/60" />
+                  <div className="h-10 w-full rounded-xl bg-slate-100 dark:bg-slate-950/60" />
+                  <div className="h-14 w-full rounded-xl bg-slate-100 dark:bg-slate-950/60" />
                 </div>
               ) : profileError ? (
-                <div className="text-xs text-amber-400">{profileError}</div>
+                <div className="text-xs text-amber-500 dark:text-amber-400">{profileError}</div>
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -782,22 +782,22 @@ export function AdminDashboardHome() {
                       <img
                         src={profile.avatar}
                         alt={profile?.name || 'Admin'}
-                        className="h-12 w-12 rounded-2xl object-cover border border-cyan-400/30 shadow-md shadow-cyan-500/10"
+                        className="h-12 w-12 rounded-2xl object-cover border border-blue-500/30 shadow-sm dark:border-cyan-400/30 dark:shadow-cyan-500/10"
                       />
                     ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 text-base font-bold text-cyan-400">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/30 bg-blue-500/10 text-base font-bold text-blue-600 dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-cyan-400">
                         {(profile?.name || 'S')[0]}
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-white">
+                      <p className="truncate text-sm font-bold text-slate-900 dark:text-white">
                         {profile?.name || 'Saumya Verma'}
                       </p>
-                      <p className="truncate text-xs text-slate-400">
+                      <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                         {profile?.title || 'Software Engineer'}
                       </p>
                       {profile?.location && (
-                        <p className="truncate text-[11px] text-cyan-400/80">
+                        <p className="truncate text-[11px] text-blue-600 dark:text-cyan-400/80">
                           {profile.location}
                         </p>
                       )}
@@ -805,7 +805,7 @@ export function AdminDashboardHome() {
                   </div>
 
                   {profile?.bio && (
-                    <p className="line-clamp-2 text-xs text-slate-400">
+                    <p className="line-clamp-2 text-xs text-slate-600 dark:text-slate-400">
                       {profile.bio}
                     </p>
                   )}
@@ -813,7 +813,7 @@ export function AdminDashboardHome() {
                   <div className="flex items-center gap-2 pt-1">
                     <Link
                       to="/admin/profile"
-                      className="flex-1 rounded-xl border border-white/10 bg-slate-950/80 py-2 text-center text-xs font-semibold text-slate-200 transition hover:border-cyan-400/30 hover:text-cyan-300"
+                      className="flex-1 rounded-xl border border-slate-200 bg-slate-50 py-2 text-center text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-500/40 hover:text-blue-600 dark:border-white/10 dark:bg-slate-950/80 dark:text-slate-200 dark:hover:border-cyan-400/30 dark:hover:text-cyan-300"
                     >
                       Edit Profile
                     </Link>
@@ -821,7 +821,7 @@ export function AdminDashboardHome() {
                       to="/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-slate-300 transition hover:border-cyan-400/30 hover:text-cyan-300"
+                      className="rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-600 shadow-sm transition hover:border-blue-500/40 hover:text-blue-600 dark:border-white/10 dark:bg-slate-950/80 dark:text-slate-300 dark:hover:border-cyan-400/30 dark:hover:text-cyan-300"
                       title="View Live Portfolio"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

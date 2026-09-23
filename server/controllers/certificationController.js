@@ -3,7 +3,7 @@ import Certification from '../models/Certification.js';
 
 export const createCertification = async (req, res) => {
   try {
-    const { name, issuer, issueDate, credentialId, credentialUrl, description, order } = req.body;
+    const { name, issuer, issueDate, credentialId, credentialUrl, image, description, order } = req.body;
 
     if (!name || !issuer) {
       return res.status(400).json({
@@ -18,6 +18,7 @@ export const createCertification = async (req, res) => {
       issueDate,
       credentialId,
       credentialUrl,
+      image,
       description,
       order
     });

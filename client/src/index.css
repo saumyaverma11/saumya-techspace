@@ -1,1 +1,314 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-primary-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-card: #FFFFFF;
+  --color-card-hover: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-text-main: #0F172A;
+  --color-text-muted: #64748B;
+  --color-accent: #2563EB;
+}
+
+.dark {
+  --color-primary-bg: #0B1220;
+  --color-surface: #0F172A;
+  --color-card: #111827;
+  --color-card-hover: #1A2233;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-text-main: #F8FAFC;
+  --color-text-muted: #94A3B8;
+  --color-accent: #38BDF8;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--color-primary-bg);
+  color: var(--color-text-main);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* ─── Scroll Reveal Animations ────────────────────────────────────────────── */
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Keyframe Animations ─────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dashboardCardFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+/* Hero Staggered Entrance (500ms-700ms timing) */
+.animate-hero-tagline {
+  animation: heroFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-hero-heading {
+  animation: heroFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-hero-subtitle {
+  opacity: 0;
+  animation: heroFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.animate-hero-bio {
+  opacity: 0;
+  animation: heroFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.animate-hero-buttons {
+  opacity: 0;
+  animation: heroFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.animate-hero-socials {
+  opacity: 0;
+  animation: heroFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+.animate-hero-card {
+  animation: scaleIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Dashboard Metric Cards Subtle Entrance */
+.animate-dashboard-card {
+  animation: dashboardCardFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Global Interactive Transitions (150ms - 250ms) ─────────────────────── */
+
+button, a, input, select, textarea {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 180ms;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.dark button:focus-visible, .dark a:focus-visible, .dark input:focus-visible, .dark select:focus-visible, .dark textarea:focus-visible {
+  outline-color: #38bdf8;
+}
+
+/* ─── Custom Sleek Scrollbar ──────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ─── Admin Workspace Dual-Theme Bridge ───────────────────────────────────── */
+/* When in Light Mode, cleanly adapt admin panels without altering JSX logic */
+
+html:not(.dark) .admin-workspace .bg-slate-900\/60,
+html:not(.dark) .admin-workspace .bg-slate-900\/70,
+html:not(.dark) .admin-workspace .bg-slate-900\/80,
+html:not(.dark) .admin-workspace .bg-slate-900\/40,
+html:not(.dark) .admin-workspace .bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+html:not(.dark) .admin-workspace .bg-slate-950,
+html:not(.dark) .admin-workspace .bg-slate-950\/60,
+html:not(.dark) .admin-workspace .bg-slate-950\/40 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .admin-workspace input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) .admin-workspace select,
+html:not(.dark) .admin-workspace textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html:not(.dark) .admin-workspace input::placeholder,
+html:not(.dark) .admin-workspace textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html:not(.dark) .admin-workspace h1,
+html:not(.dark) .admin-workspace h2,
+html:not(.dark) .admin-workspace h3 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-workspace p.text-slate-400,
+html:not(.dark) .admin-workspace span.text-slate-400,
+html:not(.dark) .admin-workspace label.text-slate-400,
+html:not(.dark) .admin-workspace th.text-slate-400 {
+  color: #64748b !important;
+}
+
+html:not(.dark) .admin-workspace .text-slate-300,
+html:not(.dark) .admin-workspace .text-slate-200 {
+  color: #334155 !important;
+}
+
+html:not(.dark) .admin-workspace .border-white\/10,
+html:not(.dark) .admin-workspace .border-white\/5 {
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .admin-workspace .divide-white\/5 > * {
+  border-color: #f1f5f9 !important;
+}
+
+html:not(.dark) .admin-workspace tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Modals in Light Mode */
+html:not(.dark) .fixed.inset-0.bg-slate-950\/80 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+}
+
+/* Modal Dialog containers */
+html:not(.dark) .fixed .bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ─── Accessible Reduced Motion ───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .animate-hero-tagline,
+  .animate-hero-heading,
+  .animate-hero-subtitle,
+  .animate-hero-bio,
+  .animate-hero-buttons,
+  .animate-hero-socials,
+  .animate-hero-card,
+  .animate-dashboard-card {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

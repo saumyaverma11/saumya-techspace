@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import portfolioService from '../../services/portfolioService';
 import defaultPicture from '../../assets/Pic.jpeg';
+import FileUpload from '../../components/admin/FileUpload';
 
 function isValidUrl(string) {
   if (!string) return true;
+  if (string.startsWith('/uploads/')) return true;
   try {
     const url = new URL(string);
     return url.protocol === 'http:' || url.protocol === 'https:';
@@ -503,74 +505,28 @@ export function AdminProfile() {
                 <h2 className="text-base font-semibold text-white">Visual Assets & Resume</h2>
               </div>
 
-              <div className="mt-6 space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300">
-                    Avatar Image URL
-                  </label>
-                  <input
-                    type="url"
-                    id="profile-avatar"
-                    value={formData.avatar}
-                    onChange={(e) => handleChange('avatar', e.target.value)}
-                    placeholder="https://example.com/avatar.jpg"
-                    className={`mt-1.5 w-full rounded-xl border bg-slate-950/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 ${
-                      formErrors.avatar
-                        ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
-                        : 'border-white/10 focus:border-cyan-400 focus:ring-cyan-400'
-                    }`}
-                  />
-                  {formErrors.avatar && (
-                    <p className="mt-1 text-[11px] text-red-400">{formErrors.avatar}</p>
-                  )}
-                  <p className="mt-1 text-[11px] text-slate-500">
-                    Direct public URL to your portrait image. Falls back to default asset if blank or broken.
-                  </p>
-                </div>
+              <div className="mt-6 space-y-6">
+                <FileUpload
+                  id="profile-avatar"
+                  label="Avatar Image (JPG, PNG, WEBP — max 5MB)"
+                  type="avatar"
+                  value={formData.avatar}
+                  onChange={(val) => handleChange('avatar', val)}
+                  error={formErrors.avatar}
+                  placeholder="https://... or click Upload Image"
+                  helperText="Direct public URL or uploaded portrait image. Falls back to default asset if blank or broken."
+                />
 
-                <div>
-                  <div className="flex items-center justify-between">
-                    <label className="block text-xs font-semibold text-slate-300">
-                      Resume URL
-                    </label>
-                    {formData.resumeUrl.trim() && (
-                      <a
-                        href={formData.resumeUrl.trim()}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-400 hover:text-cyan-300"
-                      >
-                        <span>Open Link</span>
-                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                      </a>
-                    )}
-                  </div>
-                  <input
-                    type="url"
-                    id="profile-resume"
-                    value={formData.resumeUrl}
-                    onChange={(e) => handleChange('resumeUrl', e.target.value)}
-                    placeholder="https://drive.google.com/... or https://example.com/resume.pdf"
-                    className={`mt-1.5 w-full rounded-xl border bg-slate-950/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 ${
-                      formErrors.resumeUrl
-                        ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
-                        : 'border-white/10 focus:border-cyan-400 focus:ring-cyan-400'
-                    }`}
-                  />
-                  {formErrors.resumeUrl && (
-                    <p className="mt-1 text-[11px] text-red-400">{formErrors.resumeUrl}</p>
-                  )}
-                  <p className="mt-1 text-[11px] text-slate-500">
-                    Direct link to your CV or hosted resume file.
-                  </p>
-                </div>
+                <FileUpload
+                  id="profile-resume"
+                  label="Resume Document (PDF only — max 10MB)"
+                  type="resume"
+                  value={formData.resumeUrl}
+                  onChange={(val) => handleChange('resumeUrl', val)}
+                  error={formErrors.resumeUrl}
+                  placeholder="https://... or click Upload PDF"
+                  helperText="Direct link to hosted resume or uploaded PDF document."
+                />
               </div>
             </div>
 

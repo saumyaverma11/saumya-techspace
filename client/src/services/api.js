@@ -8,8 +8,10 @@ async function request(endpoint, options = {}) {
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
 
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
   const defaultHeaders = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
@@ -69,6 +71,13 @@ export const api = {
 
   delete: (endpoint, options = {}) =>
     request(endpoint, { ...options, method: 'DELETE' }),
+
+  upload: (endpoint, formData, options = {}) =>
+    request(endpoint, {
+      ...options,
+      method: 'POST',
+      body: formData,
+    }),
 };
 
 export default api;

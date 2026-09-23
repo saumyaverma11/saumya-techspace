@@ -26,11 +26,22 @@ import AdminProfile from './pages/admin/AdminProfile';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminPlaceholder from './pages/admin/AdminPlaceholder';
+import AdminResumeRequests from './pages/admin/AdminResumeRequests';
+import ResumePage from './pages/ResumePage';
+import ResumeDownloadPage from './pages/ResumeDownloadPage';
 import portfolioService from './services/portfolioService';
+import useAnalytics from './hooks/useAnalytics';
+import useScrollReveal from './hooks/useScrollReveal';
 import './App.css';
+
+function AnalyticsTracker() {
+  useAnalytics();
+  return null;
+}
 
 function PortfolioApp() {
   const [profile, setProfile] = useState(null);
+  useScrollReveal([profile]);
 
   useEffect(() => {
     // 1. Record visitor view anonymously without blocking UI
@@ -75,9 +86,14 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <AnalyticsTracker />
           <Routes>
             {/* Public Portfolio Route */}
             <Route path="/" element={<PortfolioApp />} />
+
+            {/* Public Resume Routes */}
+            <Route path="/resume" element={<ResumePage />} />
+            <Route path="/resume/download/:token" element={<ResumeDownloadPage />} />
 
             {/* Admin Authentication Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -110,6 +126,8 @@ function App() {
               <Route path="dashboard/messages" element={<Navigate to="/admin/messages" replace />} />
               <Route path="analytics" element={<AdminAnalytics />} />
               <Route path="dashboard/analytics" element={<Navigate to="/admin/analytics" replace />} />
+              <Route path="resume-requests" element={<AdminResumeRequests />} />
+              <Route path="dashboard/resume-requests" element={<Navigate to="/admin/resume-requests" replace />} />
               <Route path="dashboard/:section" element={<AdminPlaceholder />} />
               <Route path=":section" element={<AdminPlaceholder />} />
               <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

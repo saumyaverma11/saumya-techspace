@@ -1,4 +1,6 @@
 import picture from '../assets/Pic.jpeg';
+import { Link } from 'react-router-dom';
+import analyticsService from '../services/analyticsService';
 
 function Hero({ profile }) {
   const name = profile?.name || 'Saumya Verma';
@@ -17,116 +19,123 @@ function Hero({ profile }) {
   return (
     <section
       id="home"
-      className="flex min-h-screen items-center bg-slate-950 px-5 pt-24 pb-12 text-white md:px-8 md:pt-20 md:pb-16"
+      className="flex min-h-screen items-center bg-[#F8FAFC] px-5 pt-28 pb-16 text-[#0F172A] transition-colors duration-200 dark:bg-[#0B1220] dark:text-white md:px-8 md:pt-28 md:pb-20"
     >
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 md:grid-cols-2 md:gap-16">
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
         {/* ================= LEFT CONTENT ================= */}
-        <div className="text-center md:text-left">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-400 sm:text-sm">
-            {tagline}
-          </p>
+        <div className="text-center lg:text-left">
+          <div className="animate-hero-tagline inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:border-cyan-400/20 dark:bg-cyan-400/10 dark:text-cyan-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-cyan-400" />
+            <span>{tagline}</span>
+          </div>
 
-          <h1 className="text-4xl font-bold leading-[1.08] sm:text-5xl lg:text-6xl xl:text-7xl">
-            Hi, I'm <span className="text-cyan-400">{name}</span>
+          <h1 className="animate-hero-heading mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+            Hi, I'm{' '}
+            <span className="text-blue-600 dark:text-cyan-400">{name}</span>
           </h1>
 
-          <h2 className="mx-auto mt-5 max-w-2xl text-xl font-semibold leading-snug text-slate-200 sm:text-2xl lg:mx-0 lg:text-3xl">
+          <h2 className="animate-hero-subtitle mx-auto mt-4 max-w-2xl text-xl font-semibold leading-snug text-slate-700 sm:text-2xl dark:text-slate-200 lg:mx-0 lg:text-3xl">
             {title}
           </h2>
 
-          <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-slate-400 sm:text-base lg:mx-0 lg:text-lg">
+          <p className="animate-hero-bio mx-auto mt-5 max-w-xl text-base leading-7 text-slate-600 sm:text-lg dark:text-slate-400 lg:mx-0">
             {bio}
           </p>
 
-          {/* Buttons */}
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+          {/* CTA Buttons */}
+          <div className="animate-hero-buttons mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
             <a
               href="#projects"
-              className="w-full rounded-full bg-cyan-400 px-7 py-3 text-center font-semibold text-slate-950 transition duration-300 hover:-translate-y-1 hover:bg-cyan-300 sm:w-auto"
+              className="w-full rounded-full bg-blue-600 px-7 py-3 text-center text-sm font-semibold text-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-lg active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:bg-cyan-400 dark:text-slate-950 dark:hover:bg-cyan-300 dark:hover:shadow-cyan-400/20 dark:focus-visible:outline-cyan-400 sm:w-auto"
             >
               View My Work
             </a>
 
             {resumeUrl ? (
-              <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full rounded-full border border-slate-600 px-7 py-3 text-center font-semibold text-white transition duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:text-cyan-400 sm:w-auto"
+              <Link
+                to="/resume"
+                id="hero-view-resume-btn"
+                className="w-full rounded-full border border-slate-300 bg-white px-7 py-3 text-center text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-600 hover:text-blue-600 hover:shadow-md active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-cyan-400 dark:hover:text-cyan-400 dark:hover:shadow-cyan-400/10 dark:focus-visible:outline-cyan-400 sm:w-auto"
               >
-                Resume
-              </a>
-            ) : null}
+                View Resume
+              </Link>
+            ) : (
+              <span
+                title="Resume not yet available"
+                className="w-full cursor-not-allowed rounded-full border border-slate-200 bg-white px-7 py-3 text-center text-sm font-semibold text-slate-400 opacity-60 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-500 sm:w-auto"
+              >
+                View Resume
+              </span>
+            )}
 
             <a
               href="#contact"
-              className="w-full rounded-full border border-slate-600 px-7 py-3 text-center font-semibold text-white transition duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:text-cyan-400 sm:w-auto"
+              className="w-full rounded-full border border-slate-300 bg-white px-7 py-3 text-center text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-600 hover:text-blue-600 hover:shadow-md active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-cyan-400 dark:hover:text-cyan-400 dark:hover:shadow-cyan-400/10 dark:focus-visible:outline-cyan-400 sm:w-auto"
             >
               Contact Me
             </a>
           </div>
 
           {/* Social Links */}
-          <div className="mt-7 flex justify-center gap-6 text-sm text-slate-400 lg:justify-start">
+          <div className="animate-hero-socials mt-8 flex flex-wrap items-center justify-center gap-5 text-sm font-medium text-slate-500 dark:text-slate-400 lg:justify-start">
             <a
               href={githubUrl}
               target={githubUrl !== '#' ? '_blank' : undefined}
               rel="noreferrer"
-              className="transition hover:text-cyan-400"
+              onClick={() => analyticsService.trackLinkClick('github_click', { url: githubUrl })}
+              className="transition duration-200 hover:-translate-y-0.5 hover:text-blue-600 dark:hover:text-cyan-400"
             >
               GitHub
             </a>
+
+            <span className="text-slate-300 dark:text-slate-700">•</span>
 
             <a
               href={linkedinUrl}
               target={linkedinUrl !== '#' ? '_blank' : undefined}
               rel="noreferrer"
-              className="transition hover:text-cyan-400"
+              onClick={() => analyticsService.trackLinkClick('linkedin_click', { url: linkedinUrl })}
+              className="transition duration-200 hover:-translate-y-0.5 hover:text-blue-600 dark:hover:text-cyan-400"
             >
               LinkedIn
             </a>
 
             {twitterUrl && twitterUrl !== '#' ? (
-              <a
-                href={twitterUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="transition hover:text-cyan-400"
-              >
-                Twitter / X
-              </a>
+              <>
+                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <a
+                  href={twitterUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="transition duration-200 hover:-translate-y-0.5 hover:text-blue-600 dark:hover:text-cyan-400"
+                >
+                  Twitter / X
+                </a>
+              </>
             ) : null}
 
-            <a href={email} className="transition hover:text-cyan-400">
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+
+            <a
+              href={email}
+              onClick={() => analyticsService.trackLinkClick('email_click')}
+              className="transition duration-200 hover:-translate-y-0.5 hover:text-blue-600 dark:hover:text-cyan-400"
+            >
               Email
             </a>
           </div>
         </div>
 
-        {/* ================= RIGHT PROFILE ================= */}
+        {/* ================= RIGHT PROFILE CARD ================= */}
         <div className="flex justify-center">
-          <div
-            className="
-              w-full max-w-[300px]
-              rounded-3xl
-              border border-slate-700
-              bg-slate-900
-              px-6 py-8
-              text-center
-              shadow-xl
-              sm:max-w-[340px]
-              sm:px-8 sm:py-10
-              md:max-w-[360px]
-            "
-          >
-            {/* Profile Image */}
-            <div className="mx-auto mb-6 h-52 w-52 overflow-hidden rounded-full border-2 border-cyan-400 sm:h-60 sm:w-60">
+          <div className="animate-hero-card w-full max-w-[320px] rounded-3xl border border-slate-200 bg-white p-7 text-center shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 dark:border-white/10 dark:bg-[#111827] dark:shadow-2xl sm:max-w-[360px] sm:p-8">
+            {/* Profile Image Container with gentle floating motion */}
+            <div className="animate-float-slow mx-auto mb-6 h-48 w-48 overflow-hidden rounded-full border-2 border-blue-600 p-1 dark:border-cyan-400 sm:h-56 sm:w-56">
               <img
                 src={avatar}
                 alt={name}
-                className="h-full w-full object-cover"
+                className="h-full w-full rounded-full object-cover"
                 onError={(e) => {
-                  // If custom avatar URL fails to load, fallback to local picture
                   if (e.currentTarget.src !== picture) {
                     e.currentTarget.src = picture;
                   }
@@ -135,15 +144,17 @@ function Hero({ profile }) {
             </div>
 
             {/* Name */}
-            <h3 className="text-xl font-semibold text-white">{name}</h3>
+            <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{name}</h3>
 
             {/* Role */}
-            <p className="mt-2 text-sm text-slate-400">{title.split('|')[0].trim()}</p>
+            <p className="mt-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+              {title.split('|')[0].trim()}
+            </p>
 
             {/* Small divider */}
-            <div className="mx-auto mt-6 h-px w-16 bg-cyan-400/50" />
+            <div className="mx-auto mt-5 h-0.5 w-12 rounded-full bg-blue-600/40 dark:bg-cyan-400/50" />
 
-            <p className="mt-4 text-xs leading-5 text-slate-500">
+            <p className="mt-4 text-xs leading-5 text-slate-600 dark:text-slate-400">
               {profile?.aboutDescription ||
                 'Full-Stack Developer passionate about building modern web applications.'}
             </p>

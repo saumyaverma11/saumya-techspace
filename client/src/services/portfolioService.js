@@ -1,5 +1,15 @@
 import api from './api';
 
+const toQueryString = (params = {}) => {
+  const searchParams = new URLSearchParams();
+  for (const [key, val] of Object.entries(params)) {
+    if (val !== undefined && val !== null && val !== '') {
+      searchParams.append(key, val);
+    }
+  }
+  return searchParams.toString();
+};
+
 export const portfolioService = {
   /**
    * Fetch portfolio profile information
@@ -280,6 +290,169 @@ export const portfolioService = {
   async getAnalyticsSummary() {
     const res = await api.get('/analytics/summary');
     return res.data;
+  },
+
+  // ─── Advanced Analytics Dashboard (Phase 28) ─────────────────────────────
+
+  /**
+   * Fetch high-level summary KPIs for analytics dashboard (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getDashboardSummary(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/dashboard-summary${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch daily activity trends (visits, page views, unique sessions) (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getActivityTrends(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/trends${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch scroll depth milestones and section reach metrics (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getEngagementAnalytics(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/engagement${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch project interaction analytics (views, github clicks, live clicks) (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getProjectAnalytics(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/projects${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch certification interaction analytics (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getCertificationAnalytics(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/certifications${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch resume download funnel analytics (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getResumeFunnelAnalytics(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/resume${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch contact form interaction and external link clicks (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getContactAnalytics(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/contact${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch traffic source, device, browser, and OS distribution (protected)
+   * @param {Object} [params] - { range, from, to }
+   */
+  async getTrafficAndDeviceAnalytics(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/traffic-devices${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Fetch paginated recent events list with server-side filters (protected)
+   * @param {Object} [params] - { page, limit, eventType, deviceType, source, section, from, to, range }
+   */
+  async getRecentEvents(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/analytics/events-list${qs ? `?${qs}` : ''}`);
+    return res.data;
+  },
+
+  /**
+   * Upload a file (protected admin endpoint)
+   * @param {File} file - File object from input
+   * @param {'avatar' | 'project' | 'certification' | 'resume'} type - Target purpose
+   * @returns {Promise<{ success: boolean, url: string, filename?: string, storage: string }>}
+   */
+  async uploadFile(file, type = 'general') {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (type) {
+      formData.append('type', type);
+    }
+    const res = await api.upload(`/upload?type=${encodeURIComponent(type)}`, formData);
+    return res;
+  },
+
+  // ─── Resume Download Request (Phase 26) ──────────────────────────────────
+
+  /**
+   * Submit a resume download request (public, no auth required)
+   * @param {{ name: string, email: string, message?: string }} payload
+   */
+  async submitResumeRequest(payload) {
+    const res = await api.post('/resume-requests', payload);
+    return res;
+  },
+
+  /**
+   * Fetch all resume download requests (protected admin endpoint)
+   */
+  async getResumeRequests() {
+    const res = await api.get('/resume-requests');
+    return res.data || [];
+  },
+
+  /**
+   * Fetch a single resume download request by ID (protected admin endpoint)
+   */
+  async getResumeRequestById(id) {
+    const res = await api.get(`/resume-requests/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Approve a resume download request (protected admin endpoint)
+   * @param {string} id - Request MongoDB ID
+   */
+  async approveResumeRequest(id) {
+    const res = await api.put(`/resume-requests/${id}/approve`, {});
+    return res;
+  },
+
+  /**
+   * Reject a resume download request (protected admin endpoint)
+   * @param {string} id - Request MongoDB ID
+   * @param {string} [rejectionNote] - Optional rejection reason
+   */
+  async rejectResumeRequest(id, rejectionNote = '') {
+    const res = await api.put(`/resume-requests/${id}/reject`, { rejectionNote });
+    return res;
+  },
+
+  /**
+   * Validate a download token and get the resume URL (public endpoint)
+   * @param {string} token - Raw approval token from email link
+   */
+  async validateDownloadToken(token) {
+    const res = await api.get(`/resume-requests/download/${token}`);
+    return res;
   },
 };
 

@@ -228,6 +228,90 @@ export const portfolioService = {
   },
 
   /**
+   * Fetch all achievements
+   * @param {Object} [params] - Optional query params like { all: true }
+   */
+  async getAchievements(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/achievements${qs ? `?${qs}` : ''}`);
+    return res.data || [];
+  },
+
+  /**
+   * Fetch single achievement by ID
+   */
+  async getAchievementById(id) {
+    const res = await api.get(`/achievements/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Create a new achievement record (protected)
+   */
+  async createAchievement(achievementData) {
+    const res = await api.post('/achievements', achievementData);
+    return res.data;
+  },
+
+  /**
+   * Update an existing achievement record by ID (protected)
+   */
+  async updateAchievement(id, achievementData) {
+    const res = await api.put(`/achievements/${id}`, achievementData);
+    return res.data;
+  },
+
+  /**
+   * Delete an achievement record by ID (protected)
+   */
+  async deleteAchievement(id) {
+    const res = await api.delete(`/achievements/${id}`);
+    return res;
+  },
+
+  /**
+   * Fetch all badges
+   * @param {Object} [params] - Optional query params like { all: true }
+   */
+  async getBadges(params = {}) {
+    const qs = toQueryString(params);
+    const res = await api.get(`/badges${qs ? `?${qs}` : ''}`);
+    return res.data || [];
+  },
+
+  /**
+   * Fetch single badge by ID
+   */
+  async getBadgeById(id) {
+    const res = await api.get(`/badges/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Create a new badge record (protected)
+   */
+  async createBadge(badgeData) {
+    const res = await api.post('/badges', badgeData);
+    return res.data;
+  },
+
+  /**
+   * Update an existing badge record by ID (protected)
+   */
+  async updateBadge(id, badgeData) {
+    const res = await api.put(`/badges/${id}`, badgeData);
+    return res.data;
+  },
+
+  /**
+   * Delete a badge record by ID (protected)
+   */
+  async deleteBadge(id) {
+    const res = await api.delete(`/badges/${id}`);
+    return res;
+  },
+
+  /**
    * Submit a contact form message
    * @param {{ name: string, email: string, subject: string, message: string }} payload
    */

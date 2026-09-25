@@ -3,7 +3,7 @@ import Project from '../models/Project.js';
 
 export const createProject = async (req, res) => {
   try {
-    const { title, description, image, category, technologies, githubUrl, liveUrl, featured } = req.body;
+    const { title, description, image, category, technologies, githubUrl, liveUrl, showGithubUrl, showLiveUrl, featured, displayOrder, order } = req.body;
 
     if (!title || !description) {
       return res.status(400).json({
@@ -12,6 +12,8 @@ export const createProject = async (req, res) => {
       });
     }
 
+    const resolvedOrder = displayOrder !== undefined ? Number(displayOrder) : (order !== undefined ? Number(order) : 0);
+
     const project = await Project.create({
       title,
       description,
@@ -19,8 +21,11 @@ export const createProject = async (req, res) => {
       category,
       technologies,
       githubUrl,
+      showGithubUrl: showGithubUrl !== undefined ? Boolean(showGithubUrl) : true,
       liveUrl,
-      featured
+      showLiveUrl: showLiveUrl !== undefined ? Boolean(showLiveUrl) : true,
+      featured,
+      displayOrder: isNaN(resolvedOrder) ? 0 : resolvedOrder
     });
 
     res.status(201).json({
@@ -37,7 +42,7 @@ export const createProject = async (req, res) => {
 
 export const getProjects = async (req, res) => {
   try {
-    const projects = await Project.find().sort({ createdAt: -1 });
+    const projects = await Project.find().sort({ displayOrder: 1, createdAt: -1, _id: 1 });
 
     res.status(200).json({
       success: true,
@@ -94,7 +99,22 @@ export const updateProject = async (req, res) => {
       });
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(id, req.body, {
+    const updateData = { ...req.body };
+    if (updateData.showGithubUrl !== undefined) {
+      updateData.showGithubUrl = Boolean(updateData.showGithubUrl);
+    }
+    if (updateData.showLiveUrl !== undefined) {
+      updateData.showLiveUrl = Boolean(updateData.showLiveUrl);
+    }
+    if (updateData.displayOrder !== undefined) {
+      const parsed = Number(updateData.displayOrder);
+      updateData.displayOrder = isNaN(parsed) ? 0 : parsed;
+    } else if (updateData.order !== undefined) {
+      const parsed = Number(updateData.order);
+      updateData.displayOrder = isNaN(parsed) ? 0 : parsed;
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true
     });

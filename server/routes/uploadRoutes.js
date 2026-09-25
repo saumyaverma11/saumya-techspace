@@ -128,7 +128,7 @@ router.post('/', protect, handleMulterUpload, async (req, res) => {
     const ext = path.extname(file.originalname).toLowerCase();
     const isPdf = ext === '.pdf' || file.mimetype === 'application/pdf';
     const rawType = req.query.type || req.body?.type || (isPdf ? 'resume' : 'general');
-    const type = ['avatar', 'project', 'certification', 'resume'].includes(rawType) ? rawType : 'general';
+    const type = ['avatar', 'project', 'certification', 'resume', 'achievement', 'badge'].includes(rawType) ? rawType : 'general';
 
     // File size constraints:
     // Images: max 5 MB
@@ -151,7 +151,16 @@ router.post('/', protect, handleMulterUpload, async (req, res) => {
 
     // Persistent storage: Cloudinary
     if (isCloudinaryConfigured()) {
-      const folder = `portfolio/${type === 'avatar' ? 'avatars' : type === 'project' ? 'projects' : type === 'certification' ? 'certifications' : type === 'resume' ? 'resumes' : 'general'}`;
+      const folderMap = {
+        avatar: 'avatars',
+        project: 'projects',
+        certification: 'certifications',
+        resume: 'resumes',
+        achievement: 'achievements',
+        badge: 'badges',
+        general: 'general'
+      };
+      const folder = `portfolio/${folderMap[type] || 'general'}`;
       const cleanBaseName = path.parse(file.originalname).name.replace(/[^a-zA-Z0-9_-]/g, '_');
       const publicId = isPdf
         ? `${Date.now()}-${cleanBaseName}.pdf`

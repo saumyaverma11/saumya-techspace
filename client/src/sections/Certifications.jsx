@@ -22,8 +22,19 @@ function CertificationCard({ certification, index, onVisible }) {
     certification._id ||
     `${certification.name || certification.title}-${certification.issuer}-${index}`;
   const year = formatIssueDate(certification);
-  const credentialUrl = certification.credentialUrl || certification.credential || '#';
+  const credentialUrl = certification.credentialUrl || certification.credential || '';
   const name = certification.name || certification.title;
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const PREVIEW_LIMIT = 95;
+  const description = certification.description || '';
+  const isLongDescription = description.length > PREVIEW_LIMIT;
+
+  // Credential visibility: backward compatible (defaults to true if undefined or null)
+  const isCredentialVisible =
+    certification.showCredentialUrl !== false &&
+    Boolean(credentialUrl) &&
+    credentialUrl !== '#';
 
   useEffect(() => {
     if (!cardRef.current || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
@@ -95,21 +106,52 @@ function CertificationCard({ certification, index, onVisible }) {
         </p>
       )}
 
-      {certification.description && (
-        <p className="mt-3 flex-1 text-xs leading-5 text-slate-600 dark:text-slate-400">
-          {certification.description}
-        </p>
+      {description && (
+        <div className="mt-3 flex-1 flex flex-col justify-start">
+          <p
+            id={`cert-desc-${certId}`}
+            className={`text-xs leading-5 text-slate-600 dark:text-slate-400 transition-all duration-200 ${
+              !isExpanded && isLongDescription ? 'line-clamp-2' : ''
+            }`}
+          >
+            {description}
+          </p>
+          {isLongDescription && (
+            <button
+              type="button"
+              id={`cert-toggle-${certId}`}
+              onClick={() => setIsExpanded((prev) => !prev)}
+              aria-expanded={isExpanded}
+              aria-controls={`cert-desc-${certId}`}
+              className="mt-1.5 inline-flex items-center gap-1 self-start text-[11px] font-semibold text-blue-600 transition hover:text-blue-500 focus-visible:outline-none focus-visible:underline dark:text-cyan-400 dark:hover:text-cyan-300"
+            >
+              <span>{isExpanded ? 'Read Less' : 'Read More'}</span>
+              <svg
+                className={`h-2.5 w-2.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
+        </div>
       )}
 
-      <div className="mt-auto pt-4">
-        <a
-          href={credentialUrl}
-          target={credentialUrl !== '#' ? '_blank' : undefined}
-          rel="noreferrer"
-          className="inline-block text-xs font-semibold text-blue-600 transition duration-200 hover:-translate-y-0.5 hover:text-blue-500 dark:text-cyan-400 dark:hover:text-cyan-300"
-        >
-          View Credential &rarr;
-        </a>
+      <div className="mt-auto pt-4 min-h-[36px] flex items-center">
+        {isCredentialVisible ? (
+          <a
+            id={`cert-credential-link-${certId}`}
+            href={credentialUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition duration-200 hover:-translate-y-0.5 hover:text-blue-500 dark:text-cyan-400 dark:hover:text-cyan-300"
+          >
+            <span>View Credential</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        ) : null}
       </div>
     </article>
   );

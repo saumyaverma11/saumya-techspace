@@ -8,6 +8,8 @@ import Projects from './sections/Projects';
 import Experience from './sections/Experience';
 import Education from './sections/Education';
 import Certificate from './sections/Certifications';
+import Achievements from './sections/Achievements';
+import Badges from './sections/Badges';
 import Contact from './sections/Contact';
 import Footer from './components/Footer';
 import { ThemeProvider } from './context/ThemeContext';
@@ -22,6 +24,8 @@ import AdminSkills from './pages/admin/AdminSkills';
 import AdminExperience from './pages/admin/AdminExperience';
 import AdminEducation from './pages/admin/AdminEducation';
 import AdminCertifications from './pages/admin/AdminCertifications';
+import AdminAchievements from './pages/admin/AdminAchievements';
+import AdminBadges from './pages/admin/AdminBadges';
 import AdminProfile from './pages/admin/AdminProfile';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
@@ -75,6 +79,8 @@ function PortfolioApp() {
       <Experience />
       <Education />
       <Certificate />
+      <Achievements />
+      <Badges />
       <Contact profile={profile} />
       <Footer profile={profile} />
     </>
@@ -120,6 +126,10 @@ function App() {
               <Route path="dashboard/education" element={<Navigate to="/admin/education" replace />} />
               <Route path="certifications" element={<AdminCertifications />} />
               <Route path="dashboard/certifications" element={<Navigate to="/admin/certifications" replace />} />
+              <Route path="achievements" element={<AdminAchievements />} />
+              <Route path="dashboard/achievements" element={<Navigate to="/admin/achievements" replace />} />
+              <Route path="badges" element={<AdminBadges />} />
+              <Route path="dashboard/badges" element={<Navigate to="/admin/badges" replace />} />
               <Route path="profile" element={<AdminProfile />} />
               <Route path="dashboard/profile" element={<Navigate to="/admin/profile" replace />} />
               <Route path="messages" element={<AdminMessages />} />

@@ -28,13 +28,25 @@ const projectSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    showGithubUrl: {
+      type: Boolean,
+      default: true
+    },
     liveUrl: {
       type: String,
       default: ''
     },
+    showLiveUrl: {
+      type: Boolean,
+      default: true
+    },
     featured: {
       type: Boolean,
       default: false
+    },
+    displayOrder: {
+      type: Number,
+      default: 0
     }
   },
   {

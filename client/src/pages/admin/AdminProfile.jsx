@@ -31,6 +31,7 @@ export function AdminProfile() {
     title: '',
     tagline: '',
     bio: '',
+    cardBio: '',
     aboutHeading: '',
     aboutDescription: '',
     avatar: '',
@@ -55,6 +56,7 @@ export function AdminProfile() {
           title: data.title || '',
           tagline: data.tagline || '',
           bio: data.bio || '',
+          cardBio: data.cardBio || '',
           aboutHeading: data.aboutHeading || '',
           aboutDescription: data.aboutDescription || '',
           avatar: data.avatar || '',
@@ -84,6 +86,7 @@ export function AdminProfile() {
             title: data.title || '',
             tagline: data.tagline || '',
             bio: data.bio || '',
+            cardBio: data.cardBio || '',
             aboutHeading: data.aboutHeading || '',
             aboutDescription: data.aboutDescription || '',
             avatar: data.avatar || '',
@@ -176,6 +179,7 @@ export function AdminProfile() {
         title: formData.title.trim(),
         tagline: formData.tagline.trim(),
         bio: formData.bio.trim(),
+        cardBio: formData.cardBio.trim(),
         aboutHeading: formData.aboutHeading.trim(),
         aboutDescription: formData.aboutDescription.trim(),
         avatar: formData.avatar.trim(),
@@ -194,6 +198,7 @@ export function AdminProfile() {
           title: updated.title || '',
           tagline: updated.tagline || '',
           bio: updated.bio || '',
+          cardBio: updated.cardBio || '',
           aboutHeading: updated.aboutHeading || '',
           aboutDescription: updated.aboutDescription || '',
           avatar: updated.avatar || '',
@@ -430,7 +435,41 @@ export function AdminProfile() {
                     className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
                   />
                   <p className="mt-1 text-[11px] text-slate-500">
-                    Appears above your name in the public hero section.
+                    Small badge displayed above your name in the public Hero section.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300">
+                    Hero Bio (Short Bio)
+                  </label>
+                  <textarea
+                    rows={3}
+                    id="profile-bio"
+                    value={formData.bio}
+                    onChange={(e) => handleChange('bio', e.target.value)}
+                    placeholder="e.g. I build modern, scalable and user-friendly web applications..."
+                    className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2.5 text-xs leading-relaxed text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                  />
+                  <p className="mt-1 text-[11px] text-slate-500">
+                    Concise introduction displayed on the left side of the public Hero section.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300">
+                    Profile Card Intro <span className="font-normal text-slate-500">(Optional)</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    id="profile-card-bio"
+                    value={formData.cardBio}
+                    onChange={(e) => handleChange('cardBio', e.target.value)}
+                    placeholder="e.g. Full-Stack Developer passionate about building modern web applications."
+                    className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2.5 text-xs leading-relaxed text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                  />
+                  <p className="mt-1 text-[11px] text-slate-500">
+                    Short 1-2 sentence highlight for the floating hero profile card. If left blank, falls back to your Hero Bio.
                   </p>
                 </div>
               </div>
@@ -458,22 +497,8 @@ export function AdminProfile() {
                     placeholder="e.g. Building ideas into real applications."
                     className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300">
-                    Hero Bio (Short Bio)
-                  </label>
-                  <textarea
-                    rows={3}
-                    id="profile-bio"
-                    value={formData.bio}
-                    onChange={(e) => handleChange('bio', e.target.value)}
-                    placeholder="e.g. I build modern, scalable and user-friendly web applications..."
-                    className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2.5 text-xs leading-relaxed text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                  />
                   <p className="mt-1 text-[11px] text-slate-500">
-                    Brief introduction displayed on the homepage hero section.
+                    Main heading displayed at the top of the public About section.
                   </p>
                 </div>
 
@@ -482,7 +507,7 @@ export function AdminProfile() {
                     Detailed About Description
                   </label>
                   <textarea
-                    rows={4}
+                    rows={5}
                     id="profile-about-description"
                     value={formData.aboutDescription}
                     onChange={(e) => handleChange('aboutDescription', e.target.value)}
@@ -490,7 +515,7 @@ export function AdminProfile() {
                     className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2.5 text-xs leading-relaxed text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
                   />
                   <p className="mt-1 text-[11px] text-slate-500">
-                    Detailed narrative displayed in the public About section.
+                    Comprehensive narrative displayed exclusively in the public About section (does not appear on the Hero card).
                   </p>
                 </div>
               </div>
@@ -737,7 +762,7 @@ export function AdminProfile() {
 
                 {/* Bio snippet */}
                 <p className="line-clamp-3 text-xs leading-relaxed text-slate-400">
-                  {formData.bio || formData.aboutDescription || 'A short biography describing your role, skills, and goals.'}
+                  {formData.cardBio?.trim() || formData.bio?.trim() || 'A short biography describing your role, skills, and goals.'}
                 </p>
 
                 {/* Social Links */}

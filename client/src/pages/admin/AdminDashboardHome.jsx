@@ -24,6 +24,8 @@ export function AdminDashboardHome() {
     experience: { count: 0, loading: true, error: null },
     education: { count: 0, loading: true, error: null },
     certifications: { count: 0, loading: true, error: null },
+    achievements: { count: 0, loading: true, error: null },
+    badges: { count: 0, loading: true, error: null },
     messages: { count: 0, unreadCount: 0, loading: true, error: null },
     analytics: { count: 0, todayVisits: 0, activeDays: 0, loading: true, error: null },
   });
@@ -122,6 +124,38 @@ export function AdminDashboardHome() {
         setMetrics((prev) => ({
           ...prev,
           certifications: { count: 0, loading: false, error: err.message || 'Failed to load' },
+        }));
+      });
+
+    // 5b. Achievements
+    portfolioService
+      .getAchievements({ all: true })
+      .then((data) => {
+        setMetrics((prev) => ({
+          ...prev,
+          achievements: { count: Array.isArray(data) ? data.length : 0, loading: false, error: null },
+        }));
+      })
+      .catch((err) => {
+        setMetrics((prev) => ({
+          ...prev,
+          achievements: { count: 0, loading: false, error: err.message || 'Failed to load' },
+        }));
+      });
+
+    // 5c. Badges
+    portfolioService
+      .getBadges({ all: true })
+      .then((data) => {
+        setMetrics((prev) => ({
+          ...prev,
+          badges: { count: Array.isArray(data) ? data.length : 0, loading: false, error: null },
+        }));
+      })
+      .catch((err) => {
+        setMetrics((prev) => ({
+          ...prev,
+          badges: { count: 0, loading: false, error: err.message || 'Failed to load' },
         }));
       });
 
@@ -307,6 +341,40 @@ export function AdminDashboardHome() {
       ),
     },
     {
+      title: 'Achievements',
+      metric: metrics.achievements,
+      link: '/admin/achievements',
+      color: 'from-amber-500/20 to-yellow-500/20',
+      iconColor: 'text-yellow-400',
+      icon: (
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.8}
+            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: 'Badges',
+      metric: metrics.badges,
+      link: '/admin/badges',
+      color: 'from-blue-500/20 to-cyan-500/20',
+      iconColor: 'text-cyan-400',
+      icon: (
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.8}
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+          />
+        </svg>
+      ),
+    },
+    {
       title: 'Messages',
       metric: metrics.messages,
       link: '/admin/messages',
@@ -396,6 +464,24 @@ export function AdminDashboardHome() {
     {
       label: 'Add Certification',
       path: '/admin/certifications',
+      icon: (
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Add Achievement',
+      path: '/admin/achievements',
+      icon: (
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Add Badge',
+      path: '/admin/badges',
       icon: (
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

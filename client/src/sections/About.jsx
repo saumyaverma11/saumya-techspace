@@ -98,8 +98,6 @@ function About({ profile: propProfile }) {
               {activeProfile.aboutDescription || fallbackProfile.aboutDescription}
             </p>
 
-            <p>{activeProfile.bio || fallbackProfile.bio}</p>
-
             <p>
               My primary focus is developing responsive, production-ready web applications using
               React, Node.js, Express.js, MongoDB, and modern software architecture patterns.

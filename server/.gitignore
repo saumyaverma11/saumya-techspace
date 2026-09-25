@@ -1,2 +1,8 @@
-node_modules
+node_modules/
 .env
+.env.*
+!.env.example
+
+# Local uploads directory (preserve .gitkeep)
+uploads/*
+!uploads/.gitkeep

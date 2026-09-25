@@ -1,36 +1,32 @@
 import mongoose from 'mongoose';
-import Certification from '../models/Certification.js';
+import Badge from '../models/Badge.js';
 
-export const createCertification = async (req, res) => {
+export const createBadge = async (req, res) => {
   try {
-    const { name, issuer, issueDate, credentialId, credentialUrl, showCredentialUrl, image, description, order, displayOrder } = req.body;
+    const { title, description, image, displayOrder, order, isActive } = req.body;
 
-    if (!name || !issuer) {
+    if (!title || !description) {
       return res.status(400).json({
         success: false,
-        message: 'Name and issuer are required'
+        message: 'Title and description are required'
       });
     }
 
     const resolvedOrder = displayOrder !== undefined ? Number(displayOrder) : (order !== undefined ? Number(order) : 0);
     const finalOrder = isNaN(resolvedOrder) ? 0 : resolvedOrder;
 
-    const certification = await Certification.create({
-      name,
-      issuer,
-      issueDate,
-      credentialId,
-      credentialUrl,
-      showCredentialUrl: showCredentialUrl !== undefined ? Boolean(showCredentialUrl) : true,
-      image,
-      description,
+    const badge = await Badge.create({
+      title: title.trim(),
+      description: description.trim(),
+      image: image ? image.trim() : '',
+      displayOrder: finalOrder,
       order: finalOrder,
-      displayOrder: finalOrder
+      isActive: isActive !== undefined ? Boolean(isActive) : true
     });
 
     res.status(201).json({
       success: true,
-      data: certification
+      data: badge
     });
   } catch (error) {
     res.status(500).json({
@@ -40,13 +36,24 @@ export const createCertification = async (req, res) => {
   }
 };
 
-export const getCertifications = async (req, res) => {
+export const getBadges = async (req, res) => {
   try {
-    const certifications = await Certification.find().sort({ displayOrder: 1, order: 1, createdAt: -1, _id: 1 });
+    const hasAdminToken = Boolean(
+      req.headers.authorization && req.headers.authorization.startsWith('Bearer ')
+    );
+    const includeAll = req.query.all === 'true' || hasAdminToken;
+
+    const filter = includeAll ? {} : { isActive: { $ne: false } };
+
+    const badges = await Badge.find(filter).sort({
+      displayOrder: 1,
+      createdAt: -1,
+      _id: 1
+    });
 
     res.status(200).json({
       success: true,
-      data: certifications
+      data: badges
     });
   } catch (error) {
     res.status(500).json({
@@ -56,29 +63,29 @@ export const getCertifications = async (req, res) => {
   }
 };
 
-export const getCertificationById = async (req, res) => {
+export const getBadgeById = async (req, res) => {
   try {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid certification ID format'
+        message: 'Invalid badge ID format'
       });
     }
 
-    const certification = await Certification.findById(id);
+    const badge = await Badge.findById(id);
 
-    if (!certification) {
+    if (!badge) {
       return res.status(404).json({
         success: false,
-        message: 'Certification not found'
+        message: 'Badge not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      data: certification
+      data: badge
     });
   } catch (error) {
     res.status(500).json({
@@ -88,21 +95,23 @@ export const getCertificationById = async (req, res) => {
   }
 };
 
-export const updateCertification = async (req, res) => {
+export const updateBadge = async (req, res) => {
   try {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid certification ID format'
+        message: 'Invalid badge ID format'
       });
     }
 
     const updateData = { ...req.body };
-    if (updateData.showCredentialUrl !== undefined) {
-      updateData.showCredentialUrl = Boolean(updateData.showCredentialUrl);
-    }
+    if (updateData.title !== undefined) updateData.title = updateData.title.trim();
+    if (updateData.description !== undefined) updateData.description = updateData.description.trim();
+    if (updateData.image !== undefined) updateData.image = updateData.image.trim();
+    if (updateData.isActive !== undefined) updateData.isActive = Boolean(updateData.isActive);
+
     if (updateData.displayOrder !== undefined) {
       const parsed = Number(updateData.displayOrder);
       const val = isNaN(parsed) ? 0 : parsed;
@@ -115,21 +124,21 @@ export const updateCertification = async (req, res) => {
       updateData.order = val;
     }
 
-    const updatedCertification = await Certification.findByIdAndUpdate(id, updateData, {
+    const updatedBadge = await Badge.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true
     });
 
-    if (!updatedCertification) {
+    if (!updatedBadge) {
       return res.status(404).json({
         success: false,
-        message: 'Certification not found'
+        message: 'Badge not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      data: updatedCertification
+      data: updatedBadge
     });
   } catch (error) {
     res.status(500).json({
@@ -139,29 +148,29 @@ export const updateCertification = async (req, res) => {
   }
 };
 
-export const deleteCertification = async (req, res) => {
+export const deleteBadge = async (req, res) => {
   try {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid certification ID format'
+        message: 'Invalid badge ID format'
       });
     }
 
-    const deletedCertification = await Certification.findByIdAndDelete(id);
+    const deletedBadge = await Badge.findByIdAndDelete(id);
 
-    if (!deletedCertification) {
+    if (!deletedBadge) {
       return res.status(404).json({
         success: false,
-        message: 'Certification not found'
+        message: 'Badge not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Certification deleted successfully'
+      message: 'Badge deleted successfully'
     });
   } catch (error) {
     res.status(500).json({

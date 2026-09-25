@@ -32,8 +32,11 @@ export function AdminProjects() {
     image: '',
     technologies: [],
     githubUrl: '',
+    showGithubUrl: true,
     liveUrl: '',
+    showLiveUrl: true,
     featured: false,
+    displayOrder: 0,
   });
   const [techInput, setTechInput] = useState('');
   const [formErrors, setFormErrors] = useState({});
@@ -108,8 +111,14 @@ export function AdminProjects() {
       image: '',
       technologies: [],
       githubUrl: '',
+      showGithubUrl: true,
       liveUrl: '',
+      showLiveUrl: true,
       featured: false,
+      displayOrder:
+        projects.length > 0
+          ? Math.max(...projects.map((p) => (typeof p.displayOrder === 'number' ? p.displayOrder : 0))) + 1
+          : 1,
     });
     setTechInput('');
     setFormErrors({});
@@ -132,8 +141,11 @@ export function AdminProjects() {
       image: project.image || '',
       technologies: techArray,
       githubUrl: project.githubUrl || project.github || '',
+      showGithubUrl: project.showGithubUrl !== false,
       liveUrl: project.liveUrl || project.live || '',
+      showLiveUrl: project.showLiveUrl !== false,
       featured: Boolean(project.featured),
+      displayOrder: typeof project.displayOrder === 'number' ? project.displayOrder : (typeof project.order === 'number' ? project.order : 0),
     });
     setTechInput('');
     setFormErrors({});
@@ -183,14 +195,18 @@ export function AdminProjects() {
     }
 
     const urlRegex = /^(https?:\/\/)?([\w.-]+)+([/?#].*)?$/i;
-    if (formData.githubUrl.trim() && !urlRegex.test(formData.githubUrl.trim())) {
+    if (formData.showGithubUrl && formData.githubUrl.trim() && !urlRegex.test(formData.githubUrl.trim())) {
       errors.githubUrl = 'Please enter a valid GitHub URL.';
     }
-    if (formData.liveUrl.trim() && !urlRegex.test(formData.liveUrl.trim())) {
+    if (formData.showLiveUrl && formData.liveUrl.trim() && !urlRegex.test(formData.liveUrl.trim())) {
       errors.liveUrl = 'Please enter a valid Live Demo URL.';
     }
     if (formData.image.trim() && !formData.image.trim().startsWith('/uploads/') && !urlRegex.test(formData.image.trim())) {
       errors.image = 'Please enter a valid image URL.';
+    }
+
+    if (isNaN(Number(formData.displayOrder))) {
+      errors.displayOrder = 'Display order must be a valid number.';
     }
 
     setFormErrors(errors);
@@ -211,8 +227,11 @@ export function AdminProjects() {
         image: formData.image.trim(),
         technologies: formData.technologies,
         githubUrl: formData.githubUrl.trim(),
+        showGithubUrl: Boolean(formData.showGithubUrl),
         liveUrl: formData.liveUrl.trim(),
+        showLiveUrl: Boolean(formData.showLiveUrl),
         featured: Boolean(formData.featured),
+        displayOrder: Number(formData.displayOrder) || 0,
       };
 
       if (editingProject) {
@@ -507,6 +526,9 @@ export function AdminProjects() {
 
                   {/* Status Badges Overlay */}
                   <div className="absolute left-3 top-3 flex items-center gap-2">
+                    <span className="rounded-full border border-white/15 bg-slate-950/80 px-2 py-0.5 text-[11px] font-mono font-medium text-slate-300 backdrop-blur-md">
+                      #{project.displayOrder ?? 0}
+                    </span>
                     {project.featured && (
                       <span className="rounded-full border border-yellow-400/30 bg-yellow-400/20 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-300 backdrop-blur-md">
                         ★ Featured
@@ -544,28 +566,42 @@ export function AdminProjects() {
                   )}
 
                   {/* Links Preview */}
-                  <div className="mt-4 flex items-center gap-3 border-t border-white/5 pt-3 text-xs text-slate-400">
+                  <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-white/5 pt-3 text-xs text-slate-400">
                     {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 hover:text-cyan-400"
-                      >
-                        <span>GitHub</span>
-                        <span className="text-[10px]">&nearr;</span>
-                      </a>
+                      <span className="inline-flex items-center gap-1">
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 hover:text-cyan-400"
+                        >
+                          <span>GitHub</span>
+                          <span className="text-[10px]">&nearr;</span>
+                        </a>
+                        {project.showGithubUrl === false && (
+                          <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500">
+                            Hidden
+                          </span>
+                        )}
+                      </span>
                     )}
                     {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300"
-                      >
-                        <span>Live Demo</span>
-                        <span className="text-[10px]">&nearr;</span>
-                      </a>
+                      <span className="inline-flex items-center gap-1">
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300"
+                        >
+                          <span>Live Demo</span>
+                          <span className="text-[10px]">&nearr;</span>
+                        </a>
+                        {project.showLiveUrl === false && (
+                          <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500">
+                            Hidden
+                          </span>
+                        )}
+                      </span>
                     )}
                   </div>
 
@@ -622,7 +658,7 @@ export function AdminProjects() {
           />
 
           {/* Dialog Card */}
-          <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-slate-900 shadow-2xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
               <div>
@@ -734,6 +770,34 @@ export function AdminProjects() {
                 </div>
               </div>
 
+              {/* Display Order */}
+              <div>
+                <label htmlFor="modalDisplayOrder" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  Display Order (lower numbers appear first)
+                </label>
+                <input
+                  id="modalDisplayOrder"
+                  type="number"
+                  value={formData.displayOrder}
+                  onChange={(e) => {
+                    setFormData((prev) => ({ ...prev, displayOrder: e.target.value }));
+                    if (formErrors.displayOrder) setFormErrors((prev) => ({ ...prev, displayOrder: null }));
+                  }}
+                  className={`mt-1.5 w-full rounded-xl border bg-slate-950 px-4 py-2.5 text-sm text-white outline-none transition ${
+                    formErrors.displayOrder
+                      ? 'border-red-500/60 focus:border-red-500'
+                      : 'border-white/10 focus:border-cyan-400'
+                  }`}
+                  placeholder="0"
+                />
+                {formErrors.displayOrder && (
+                  <p className="mt-1 text-xs text-red-400">{formErrors.displayOrder}</p>
+                )}
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Defines the order projects appear on the live portfolio (e.g. 1, 2, 3).
+                </p>
+              </div>
+
               {/* Technologies Tag Input */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
@@ -798,44 +862,92 @@ export function AdminProjects() {
               </div>
 
               {/* GitHub and Live Demo Links */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="modalGithub" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                    GitHub URL
-                  </label>
-                  <input
-                    id="modalGithub"
-                    type="url"
-                    value={formData.githubUrl}
-                    onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, githubUrl: e.target.value }));
-                      if (formErrors.githubUrl) setFormErrors((prev) => ({ ...prev, githubUrl: null }));
-                    }}
-                    placeholder="https://github.com/username/repo"
-                    className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
-                  />
-                  {formErrors.githubUrl && (
-                    <p className="mt-1 text-xs text-red-400">{formErrors.githubUrl}</p>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {/* GitHub Link Control */}
+                <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="checkbox"
+                      id="modalShowGithub"
+                      checked={formData.showGithubUrl}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData((prev) => ({ ...prev, showGithubUrl: checked }));
+                        if (!checked && formErrors.githubUrl) {
+                          setFormErrors((prev) => ({ ...prev, githubUrl: null }));
+                        }
+                      }}
+                      className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-cyan-400 cursor-pointer"
+                    />
+                    <label htmlFor="modalShowGithub" className="text-xs font-semibold text-slate-300 cursor-pointer select-none">
+                      Show GitHub Link
+                    </label>
+                  </div>
+
+                  {formData.showGithubUrl && (
+                    <div className="mt-3">
+                      <label htmlFor="modalGithub" className="block text-[11px] font-medium text-slate-400">
+                        GitHub URL <span className="text-slate-500 font-normal">(Optional)</span>
+                      </label>
+                      <input
+                        id="modalGithub"
+                        type="url"
+                        value={formData.githubUrl}
+                        onChange={(e) => {
+                          setFormData((prev) => ({ ...prev, githubUrl: e.target.value }));
+                          if (formErrors.githubUrl) setFormErrors((prev) => ({ ...prev, githubUrl: null }));
+                        }}
+                        placeholder="https://github.com/username/repo"
+                        className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
+                      />
+                      {formErrors.githubUrl && (
+                        <p className="mt-1 text-xs text-red-400">{formErrors.githubUrl}</p>
+                      )}
+                    </div>
                   )}
                 </div>
 
-                <div>
-                  <label htmlFor="modalLive" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                    Live Demo URL
-                  </label>
-                  <input
-                    id="modalLive"
-                    type="url"
-                    value={formData.liveUrl}
-                    onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, liveUrl: e.target.value }));
-                      if (formErrors.liveUrl) setFormErrors((prev) => ({ ...prev, liveUrl: null }));
-                    }}
-                    placeholder="https://myproject.vercel.app"
-                    className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
-                  />
-                  {formErrors.liveUrl && (
-                    <p className="mt-1 text-xs text-red-400">{formErrors.liveUrl}</p>
+                {/* Live Demo Link Control */}
+                <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="checkbox"
+                      id="modalShowLive"
+                      checked={formData.showLiveUrl}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData((prev) => ({ ...prev, showLiveUrl: checked }));
+                        if (!checked && formErrors.liveUrl) {
+                          setFormErrors((prev) => ({ ...prev, liveUrl: null }));
+                        }
+                      }}
+                      className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-cyan-400 cursor-pointer"
+                    />
+                    <label htmlFor="modalShowLive" className="text-xs font-semibold text-slate-300 cursor-pointer select-none">
+                      Show Live Demo
+                    </label>
+                  </div>
+
+                  {formData.showLiveUrl && (
+                    <div className="mt-3">
+                      <label htmlFor="modalLive" className="block text-[11px] font-medium text-slate-400">
+                        Live Demo URL <span className="text-slate-500 font-normal">(Optional)</span>
+                      </label>
+                      <input
+                        id="modalLive"
+                        type="url"
+                        value={formData.liveUrl}
+                        onChange={(e) => {
+                          setFormData((prev) => ({ ...prev, liveUrl: e.target.value }));
+                          if (formErrors.liveUrl) setFormErrors((prev) => ({ ...prev, liveUrl: null }));
+                        }}
+                        placeholder="https://myproject.vercel.app"
+                        className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
+                      />
+                      {formErrors.liveUrl && (
+                        <p className="mt-1 text-xs text-red-400">{formErrors.liveUrl}</p>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

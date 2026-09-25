@@ -37,6 +37,7 @@ export function AdminCertifications() {
     issueDate: '',
     credentialId: '',
     credentialUrl: '',
+    showCredentialUrl: true,
     image: '',
     description: '',
     order: 0,
@@ -126,11 +127,12 @@ export function AdminCertifications() {
       issueDate: '',
       credentialId: '',
       credentialUrl: '',
+      showCredentialUrl: true,
       image: '',
       description: '',
       order:
         certifications.length > 0
-          ? Math.max(...certifications.map((c) => (typeof c.order === 'number' ? c.order : 0))) + 1
+          ? Math.max(...certifications.map((c) => (typeof c.displayOrder === 'number' ? c.displayOrder : (typeof c.order === 'number' ? c.order : 0)))) + 1
           : 1,
     });
     setFormErrors({});
@@ -146,9 +148,10 @@ export function AdminCertifications() {
       issueDate: item.issueDate || '',
       credentialId: item.credentialId || '',
       credentialUrl: item.credentialUrl || '',
+      showCredentialUrl: item.showCredentialUrl !== false,
       image: item.image || '',
       description: item.description || '',
-      order: typeof item.order === 'number' ? item.order : 0,
+      order: typeof item.displayOrder === 'number' ? item.displayOrder : (typeof item.order === 'number' ? item.order : 0),
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -189,15 +192,18 @@ export function AdminCertifications() {
 
     setIsSubmitting(true);
     try {
+      const orderVal = Number(formData.order) || 0;
       const payload = {
         name: formData.name.trim(),
         issuer: formData.issuer.trim(),
         issueDate: formData.issueDate.trim(),
         credentialId: formData.credentialId.trim(),
         credentialUrl: formData.credentialUrl.trim(),
+        showCredentialUrl: Boolean(formData.showCredentialUrl),
         image: formData.image.trim(),
         description: formData.description.trim(),
-        order: Number(formData.order) || 0,
+        order: orderVal,
+        displayOrder: orderVal,
       };
 
       if (editingCertification) {
@@ -520,7 +526,7 @@ export function AdminCertifications() {
                       title="Display Sort Order"
                       className="rounded-lg border border-white/10 bg-slate-950/80 px-2 py-1 text-[11px] font-mono font-medium text-slate-400"
                     >
-                      #{item.order ?? 0}
+                      #{item.displayOrder ?? item.order ?? 0}
                     </span>
                   </div>
 
@@ -572,7 +578,7 @@ export function AdminCertifications() {
 
                   {/* Credential Verification Link */}
                   {item.credentialUrl && (
-                    <div className="mt-4">
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
                       <a
                         href={item.credentialUrl}
                         target="_blank"
@@ -589,6 +595,11 @@ export function AdminCertifications() {
                           />
                         </svg>
                       </a>
+                      {item.showCredentialUrl === false && (
+                        <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500 dark:text-amber-400">
+                          Public Link Hidden
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -637,7 +648,7 @@ export function AdminCertifications() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/80 p-4 backdrop-blur-sm">
           <div
-            className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl sm:p-8"
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl sm:p-8"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -773,6 +784,22 @@ export function AdminCertifications() {
                   {formErrors.credentialUrl && (
                     <p className="mt-1 text-[11px] text-red-400">{formErrors.credentialUrl}</p>
                   )}
+                  {/* Show Credential Link Checkbox */}
+                  <div className="mt-2.5 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="certification-form-show-credential"
+                      checked={formData.showCredentialUrl}
+                      onChange={(e) => setFormData({ ...formData, showCredentialUrl: e.target.checked })}
+                      className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-cyan-400 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="certification-form-show-credential"
+                      className="text-xs font-medium text-slate-300 cursor-pointer select-none"
+                    >
+                      Show Credential Link (Display &quot;View Credential&quot; button publicly)
+                    </label>
+                  </div>
                 </div>
 
                 <div>

@@ -19,6 +19,10 @@ const profileSchema = new mongoose.Schema(
       type: String,
       default: 'I build modern, scalable and user-friendly web applications using modern frontend and backend technologies.'
     },
+    cardBio: {
+      type: String,
+      default: ''
+    },
     aboutHeading: {
       type: String,
       default: 'Building ideas into real applications.'

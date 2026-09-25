@@ -17,6 +17,8 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import resumeRequestRoutes from './routes/resumeRequestRoutes.js';
+import achievementRoutes from './routes/achievementRoutes.js';
+import badgeRoutes from './routes/badgeRoutes.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,14 +33,26 @@ const PORT = process.env.PORT || 5000;
 
 connectDB();
 
+const rawClientUrls = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/+$/, '')).filter(Boolean)
+  : [];
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
-  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map((url) => url.trim()) : [])
+  ...rawClientUrls
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl, health checks)
+    if (!origin) return callback(null, true);
+    const normalizedOrigin = origin.replace(/\/+$/, '');
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS policy: Origin ${origin} not allowed.`));
+  },
   credentials: true
 }));
 
@@ -52,6 +66,8 @@ app.use('/api/skills', skillRoutes);
 app.use('/api/experience', experienceRoutes);
 app.use('/api/education', educationRoutes);
 app.use('/api/certifications', certificationRoutes);
+app.use('/api/achievements', achievementRoutes);
+app.use('/api/badges', badgeRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/auth', authRoutes);

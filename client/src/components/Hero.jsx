@@ -9,6 +9,10 @@ function Hero({ profile }) {
   const bio =
     profile?.bio ||
     'I build modern, scalable and user-friendly web applications using modern frontend and backend technologies.';
+  const cardBio =
+    profile?.cardBio?.trim() ||
+    profile?.bio ||
+    'Full-Stack Developer passionate about building modern web applications.';
   const avatar = profile?.avatar || picture;
   const githubUrl = profile?.githubUrl || '#';
   const linkedinUrl = profile?.linkedinUrl || '#';
@@ -154,9 +158,8 @@ function Hero({ profile }) {
             {/* Small divider */}
             <div className="mx-auto mt-5 h-0.5 w-12 rounded-full bg-blue-600/40 dark:bg-cyan-400/50" />
 
-            <p className="mt-4 text-xs leading-5 text-slate-600 dark:text-slate-400">
-              {profile?.aboutDescription ||
-                'Full-Stack Developer passionate about building modern web applications.'}
+            <p className="mt-4 line-clamp-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
+              {cardBio}
             </p>
           </div>
         </div>

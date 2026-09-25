@@ -16,6 +16,8 @@ function Navbar({ profile }) {
     { label: 'Experience', href: '#experience' },
     { label: 'Education', href: '#education' },
     { label: 'Certifications', href: '#certifications' },
+    { label: 'Achievements', href: '#achievements' },
+    { label: 'Badges', href: '#badges' },
     { label: 'Contact', href: '#contact' },
   ];
 

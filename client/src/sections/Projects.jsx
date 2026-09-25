@@ -5,8 +5,16 @@ import analyticsService from '../services/analyticsService';
 function ProjectCard({ project, onVisible }) {
   const cardRef = useRef(null);
   const projectId = project._id || project.id;
-  const githubUrl = project.githubUrl || project.github || '#';
-  const liveUrl = project.liveUrl || project.live || '#';
+  const rawGithub = (project.githubUrl || project.github || '').trim();
+  const rawLive = (project.liveUrl || project.live || '').trim();
+  const isGithubVisible = project.showGithubUrl !== false && Boolean(rawGithub) && rawGithub !== '#';
+  const isLiveVisible = project.showLiveUrl !== false && Boolean(rawLive) && rawLive !== '#';
+  const hasAnyLink = isGithubVisible || isLiveVisible;
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const PREVIEW_LIMIT = 140;
+  const description = project.description || '';
+  const isLongDescription = description.length > PREVIEW_LIMIT;
 
   useEffect(() => {
     if (!cardRef.current || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
@@ -90,9 +98,37 @@ function ProjectCard({ project, onVisible }) {
           </div>
         </div>
 
-        <p className="min-h-[72px] flex-1 text-sm leading-6 text-slate-600 dark:text-slate-400">
-          {project.description}
-        </p>
+        <div className="flex-1 flex flex-col justify-start">
+          <p
+            id={`project-desc-${projectId}`}
+            className={`text-sm leading-6 text-slate-600 dark:text-slate-400 transition-all duration-200 ${
+              !isExpanded && isLongDescription ? 'line-clamp-3' : ''
+            }`}
+          >
+            {description}
+          </p>
+
+          {isLongDescription && (
+            <button
+              type="button"
+              id={`project-toggle-${projectId}`}
+              onClick={() => setIsExpanded((prev) => !prev)}
+              aria-expanded={isExpanded}
+              aria-controls={`project-desc-${projectId}`}
+              className="mt-2 inline-flex items-center gap-1 self-start text-xs font-semibold text-blue-600 transition hover:text-blue-500 focus-visible:outline-none focus-visible:underline dark:text-cyan-400 dark:hover:text-cyan-300"
+            >
+              <span>{isExpanded ? 'Read Less' : 'Read More'}</span>
+              <svg
+                className={`h-3 w-3 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
+        </div>
 
         {/* Technologies Tags */}
         {techList.length > 0 && (
@@ -109,31 +145,37 @@ function ProjectCard({ project, onVisible }) {
         )}
 
         {/* Action Links */}
-        <div className="mt-6 flex items-center gap-4 pt-2">
-          <a
-            href={githubUrl}
-            target={githubUrl !== '#' ? '_blank' : undefined}
-            rel="noreferrer"
-            onClick={() => {
-              analyticsService.trackProjectGithubClick(projectId, project.title);
-            }}
-            className="inline-flex items-center text-sm font-semibold text-slate-600 transition duration-200 hover:-translate-y-0.5 hover:text-blue-600 dark:text-slate-300 dark:hover:text-cyan-400"
-          >
-            GitHub &rarr;
-          </a>
+        {hasAnyLink && (
+          <div className="mt-6 flex items-center gap-4 pt-2">
+            {isGithubVisible && (
+              <a
+                href={rawGithub}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => {
+                  analyticsService.trackProjectGithubClick(projectId, project.title);
+                }}
+                className="inline-flex items-center text-sm font-semibold text-slate-600 transition duration-200 hover:-translate-y-0.5 hover:text-blue-600 dark:text-slate-300 dark:hover:text-cyan-400"
+              >
+                GitHub &rarr;
+              </a>
+            )}
 
-          <a
-            href={liveUrl}
-            target={liveUrl !== '#' ? '_blank' : undefined}
-            rel="noreferrer"
-            onClick={() => {
-              analyticsService.trackProjectLiveClick(projectId, project.title);
-            }}
-            className="inline-flex items-center text-sm font-semibold text-blue-600 transition duration-200 hover:-translate-y-0.5 hover:text-blue-500 dark:text-cyan-400 dark:hover:text-cyan-300"
-          >
-            Live Demo &rarr;
-          </a>
-        </div>
+            {isLiveVisible && (
+              <a
+                href={rawLive}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => {
+                  analyticsService.trackProjectLiveClick(projectId, project.title);
+                }}
+                className="inline-flex items-center text-sm font-semibold text-blue-600 transition duration-200 hover:-translate-y-0.5 hover:text-blue-500 dark:text-cyan-400 dark:hover:text-cyan-300"
+              >
+                Live Demo &rarr;
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </article>
   );

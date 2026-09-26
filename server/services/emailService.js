@@ -1,19 +1,22 @@
 import nodemailer from 'nodemailer';
 
-export const sendContactEmail = async ({ name, email, subject, message }) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-    console.warn('Email credentials not configured. Skipping email dispatch.');
-    return { skipped: true };
-  }
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
+// Helper function to create Nodemailer transporter for Gmail SMTP
+const getTransporter = () => {
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // SSL/TLS on port 465
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD
-    }
+    },
+    connectionTimeout: 10000, // 10s connection timeout
+    greetingTimeout: 10000,
+    socketTimeout: 15000
   });
+};
 
+export const sendContactEmail = async ({ name, email, subject, message }) => {
   const formattedDate = new Date().toLocaleString('en-US', {
     dateStyle: 'full',
     timeStyle: 'short'
@@ -46,6 +49,48 @@ export const sendContactEmail = async ({ name, email, subject, message }) => {
     </div>
   `;
 
+  // Production: If RESEND_API_KEY is configured, dispatch via Resend HTTPS API (bypasses Render SMTP port blocking)
+  if (process.env.RESEND_API_KEY) {
+    const toAddress = (process.env.CONTACT_RECEIVER || process.env.EMAIL_USER || '').trim();
+    if (!toAddress) {
+      console.warn('Neither CONTACT_RECEIVER nor EMAIL_USER is configured. Skipping email dispatch.');
+      return { skipped: true };
+    }
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'Saumya TechSpace <onboarding@resend.dev>',
+        to: [toAddress],
+        reply_to: email,
+        subject: `New Portfolio Contact — ${subject}`,
+        text: textContent,
+        html: htmlContent
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errMessage = errorData.message || response.statusText || 'Unknown error';
+      throw new Error(`Resend API HTTP ${response.status}: ${errMessage}`);
+    }
+
+    const resendData = await response.json();
+    return { success: true, messageId: resendData.id, provider: 'resend' };
+  }
+
+  // Localhost / Development: fallback to Gmail SMTP
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.warn('Email credentials not configured. Skipping email dispatch.');
+    return { skipped: true };
+  }
+
+  const transporter = getTransporter();
+
   const mailOptions = {
     from: `Saumya TechSpace <${process.env.EMAIL_USER}>`,
     to: process.env.CONTACT_RECEIVER || process.env.EMAIL_USER,
@@ -65,13 +110,7 @@ export const sendPasswordResetEmail = async ({ toEmail, resetToken }) => {
     return { skipped: true };
   }
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
-  });
+  const transporter = getTransporter();
 
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
   const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
@@ -127,13 +166,7 @@ export const sendResumeRequestNotification = async ({
     return { skipped: true };
   }
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
-  });
+  const transporter = getTransporter();
 
   const formattedDate = new Date(requestedAt).toLocaleString('en-US', {
     dateStyle: 'full',
@@ -208,13 +241,7 @@ export const sendResumeApprovalEmail = async ({
     return { skipped: true };
   }
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
-  });
+  const transporter = getTransporter();
 
   const textContent = `Your Resume Download Request Has Been Approved\n\nHi ${visitorName},\n\nYour resume download request has been approved.\n\nYou can access the authorized resume download here:\n${downloadUrl}\n\nThis link is valid for ${expireDays} days. After it expires, you will need to submit a new request.\n\nThank you for your interest.\n\nSaumya TechSpace`;
 
@@ -265,13 +292,7 @@ export const sendResumeRejectionEmail = async ({
     return { skipped: true };
   }
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
-  });
+  const transporter = getTransporter();
 
   const textContent = `Saumya TechSpace — Resume Download Request Update\n\nHi ${visitorName},\n\nThank you for your interest in downloading the resume.\n\nUnfortunately, your request was not approved at this time.\n${rejectionNote ? `\nNote: ${rejectionNote}\n` : ''}\nYou are welcome to reach out via the contact form if you have any questions.\n\nSaumya TechSpace`;
 

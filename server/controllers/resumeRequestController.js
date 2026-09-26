@@ -207,11 +207,14 @@ export const approveRequest = async (req, res) => {
       });
     }
 
-    const { request: updatedRequest } = await executeApproveRequest({
+    const { request: updatedRequest, rawDownloadToken } = await executeApproveRequest({
       request,
       source: 'admin_dashboard',
       reviewedBy: req.admin?.username || req.admin?.email || 'admin'
     });
+
+    const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').split(',')[0].trim();
+    const downloadUrl = rawDownloadToken ? `${clientUrl}/resume/download/${rawDownloadToken}` : null;
 
     return res.status(200).json({
       success: true,
@@ -221,7 +224,8 @@ export const approveRequest = async (req, res) => {
         status: updatedRequest.status,
         reviewedAt: updatedRequest.reviewedAt,
         reviewedBy: updatedRequest.reviewedBy,
-        approvalTokenExpire: updatedRequest.approvalTokenExpire
+        approvalTokenExpire: updatedRequest.approvalTokenExpire,
+        downloadUrl
       }
     });
   } catch (error) {
@@ -354,11 +358,11 @@ export const emailActionApprove = async (req, res) => {
 // 1-Click Email Action: POST Approve Execution (MUTATES state)
 export const emailActionApproveConfirm = async (req, res) => {
   const wantsJson = req.headers['accept']?.includes('application/json') || req.query.format === 'json';
-  const respond = (httpStatus, type, title, message, success = false) => {
+  const respond = (httpStatus, type, title, message, success = false, downloadUrl = null) => {
     if (wantsJson) {
-      return res.status(httpStatus).json({ success, message, title });
+      return res.status(httpStatus).json({ success, message, title, downloadUrl });
     }
-    return res.status(httpStatus).send(renderConfirmationPage({ type, title, message }));
+    return res.status(httpStatus).send(renderConfirmationPage({ type, title, message, downloadUrl }));
   };
 
   try {
@@ -389,13 +393,16 @@ export const emailActionApproveConfirm = async (req, res) => {
     }
 
     // Execute shared approval logic on POST
-    await executeApproveRequest({
+    const { rawDownloadToken } = await executeApproveRequest({
       request,
       source: 'email',
       reviewedBy: 'email_action'
     });
 
-    return respond(200, 'approved', 'Resume Request Approved', 'An approval email has been sent to the requester.', true);
+    const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').split(',')[0].trim();
+    const downloadUrl = rawDownloadToken ? `${clientUrl}/resume/download/${rawDownloadToken}` : null;
+
+    return respond(200, 'approved', 'Resume Request Approved', 'The resume download request has been approved.', true, downloadUrl);
   } catch (error) {
     console.error('emailActionApproveConfirm error:', error.message);
     return respond(500, 'invalid', 'Action Error', 'Unable to complete approval. Please try again or use the Admin Panel.');

@@ -160,7 +160,7 @@ export const executeRejectRequest = async ({
  * @param {string} params.message
  * @returns {string} HTML string
  */
-export const renderConfirmationPage = ({ type, title, message }) => {
+export const renderConfirmationPage = ({ type, title, message, downloadUrl = null }) => {
   const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173')
     .split(',')[0]
     .trim();
@@ -202,6 +202,20 @@ export const renderConfirmationPage = ({ type, title, message }) => {
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
     </svg>`;
   }
+
+  const downloadCardHtml = downloadUrl
+    ? `
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; margin: 20px 0 24px 0; text-align: left;">
+        <p style="font-size: 11px; color: #94a3b8; margin: 0 0 6px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Authorized Download Link:</p>
+        <p style="margin: 0 0 10px 0; font-size: 13px; word-break: break-all;">
+          <a href="${downloadUrl}" target="_blank" rel="noopener noreferrer" style="color: #06b6d4; text-decoration: underline; font-weight: 500;">${downloadUrl}</a>
+        </p>
+        <p style="font-size: 12px; color: #64748b; margin: 0; line-height: 1.4;">
+          This secure, time-limited link is active. You can copy it to reply to the visitor's notification email in Gmail directly.
+        </p>
+      </div>
+    `
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -252,7 +266,7 @@ export const renderConfirmationPage = ({ type, title, message }) => {
       font-size: 15px;
       line-height: 1.6;
       color: #94a3b8;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     .btn {
       display: inline-block;
@@ -285,6 +299,7 @@ export const renderConfirmationPage = ({ type, title, message }) => {
     </div>
     <h1>${title}</h1>
     <p>${message}</p>
+    ${downloadCardHtml}
     <a href="${adminUrl}" class="btn">Go to Admin Panel</a>
     <div class="footer">
       Saumya TechSpace Portfolio &bull; Secure Email Action

@@ -161,13 +161,6 @@ export const sendResumeRequestNotification = async ({
   rawApproveToken,
   rawRejectToken
 }) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-    console.warn('Email credentials not configured. Skipping resume request notification.');
-    return { skipped: true };
-  }
-
-  const transporter = getTransporter();
-
   const formattedDate = new Date(requestedAt).toLocaleString('en-US', {
     dateStyle: 'full',
     timeStyle: 'short'
@@ -217,6 +210,48 @@ export const sendResumeRequestNotification = async ({
     </div>
   `;
 
+  // Production: If RESEND_API_KEY is configured, dispatch via Resend HTTPS API (bypasses Render SMTP port blocking)
+  if (process.env.RESEND_API_KEY) {
+    const toAddress = (process.env.CONTACT_RECEIVER || process.env.EMAIL_USER || '').trim();
+    if (!toAddress) {
+      console.warn('Neither CONTACT_RECEIVER nor EMAIL_USER is configured. Skipping resume request notification.');
+      return { skipped: true };
+    }
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'Saumya TechSpace <onboarding@resend.dev>',
+        to: [toAddress],
+        reply_to: visitorEmail,
+        subject: `New Resume Download Request — ${visitorName}`,
+        text: textContent,
+        html: htmlContent
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errMessage = errorData.message || response.statusText || 'Unknown error';
+      throw new Error(`Resend API HTTP ${response.status}: ${errMessage}`);
+    }
+
+    const resendData = await response.json();
+    return { success: true, messageId: resendData.id, provider: 'resend' };
+  }
+
+  // Localhost / Development: fallback to Gmail SMTP
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.warn('Email credentials not configured. Skipping resume request notification.');
+    return { skipped: true };
+  }
+
+  const transporter = getTransporter();
+
   const mailOptions = {
     from: `Saumya TechSpace <${process.env.EMAIL_USER}>`,
     to: process.env.CONTACT_RECEIVER || process.env.EMAIL_USER,
@@ -236,13 +271,6 @@ export const sendResumeApprovalEmail = async ({
   downloadUrl,
   expireDays
 }) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-    console.warn('Email credentials not configured. Skipping resume approval email.');
-    return { skipped: true };
-  }
-
-  const transporter = getTransporter();
-
   const textContent = `Your Resume Download Request Has Been Approved\n\nHi ${visitorName},\n\nYour resume download request has been approved.\n\nYou can access the authorized resume download here:\n${downloadUrl}\n\nThis link is valid for ${expireDays} days. After it expires, you will need to submit a new request.\n\nThank you for your interest.\n\nSaumya TechSpace`;
 
   const htmlContent = `
@@ -270,6 +298,46 @@ export const sendResumeApprovalEmail = async ({
     </div>
   `;
 
+  // Production: Try Resend HTTPS if key is configured
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Saumya TechSpace <onboarding@resend.dev>',
+          to: [visitorEmail],
+          subject: 'Your Resume Download Request Has Been Approved — Saumya TechSpace',
+          text: textContent,
+          html: htmlContent
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.warn(`Visitor approval email via Resend skipped (${response.status}): ${errorData.message || response.statusText}`);
+        return { skipped: true, reason: errorData.message };
+      }
+
+      const resendData = await response.json();
+      return { success: true, messageId: resendData.id, provider: 'resend' };
+    } catch (err) {
+      console.warn('Visitor approval email dispatch error:', err.message);
+      return { skipped: true, error: err.message };
+    }
+  }
+
+  // Localhost / Development: fallback to Gmail SMTP
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.warn('Email credentials not configured. Skipping resume approval email.');
+    return { skipped: true };
+  }
+
+  const transporter = getTransporter();
+
   const mailOptions = {
     from: `Saumya TechSpace <${process.env.EMAIL_USER}>`,
     to: visitorEmail,
@@ -287,13 +355,6 @@ export const sendResumeRejectionEmail = async ({
   visitorEmail,
   rejectionNote
 }) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-    console.warn('Email credentials not configured. Skipping resume rejection email.');
-    return { skipped: true };
-  }
-
-  const transporter = getTransporter();
-
   const textContent = `Saumya TechSpace — Resume Download Request Update\n\nHi ${visitorName},\n\nThank you for your interest in downloading the resume.\n\nUnfortunately, your request was not approved at this time.\n${rejectionNote ? `\nNote: ${rejectionNote}\n` : ''}\nYou are welcome to reach out via the contact form if you have any questions.\n\nSaumya TechSpace`;
 
   const htmlContent = `
@@ -315,6 +376,46 @@ export const sendResumeRejectionEmail = async ({
       </div>
     </div>
   `;
+
+  // Production: Try Resend HTTPS if key is configured
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Saumya TechSpace <onboarding@resend.dev>',
+          to: [visitorEmail],
+          subject: 'Resume Download Request Update — Saumya TechSpace',
+          text: textContent,
+          html: htmlContent
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.warn(`Visitor rejection email via Resend skipped (${response.status}): ${errorData.message || response.statusText}`);
+        return { skipped: true, reason: errorData.message };
+      }
+
+      const resendData = await response.json();
+      return { success: true, messageId: resendData.id, provider: 'resend' };
+    } catch (err) {
+      console.warn('Visitor rejection email dispatch error:', err.message);
+      return { skipped: true, error: err.message };
+    }
+  }
+
+  // Localhost / Development: fallback to Gmail SMTP
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.warn('Email credentials not configured. Skipping resume rejection email.');
+    return { skipped: true };
+  }
+
+  const transporter = getTransporter();
 
   const mailOptions = {
     from: `Saumya TechSpace <${process.env.EMAIL_USER}>`,

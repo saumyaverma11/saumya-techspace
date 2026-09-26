@@ -77,6 +77,13 @@ const resumeDownloadRequestSchema = new mongoose.Schema(
       default: null,
       select: false
     },
+    // Cryptographically secure capability token for visitor to track request status
+    // Only SHA-256 hash is stored; raw token returned to visitor and held in browser localStorage
+    trackingToken: {
+      type: String,
+      default: null,
+      select: false
+    },
     emailActionTokenExpire: {
       type: Date,
       default: null
@@ -89,6 +96,7 @@ const resumeDownloadRequestSchema = new mongoose.Schema(
 
 // Index for efficient token lookups
 resumeDownloadRequestSchema.index({ approvalToken: 1 });
+resumeDownloadRequestSchema.index({ trackingToken: 1 });
 resumeDownloadRequestSchema.index({ emailApproveToken: 1 });
 resumeDownloadRequestSchema.index({ emailRejectToken: 1 });
 resumeDownloadRequestSchema.index({ email: 1 });

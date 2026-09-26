@@ -37,23 +37,40 @@ const rawClientUrls = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/+$/, '')).filter(Boolean)
   : [];
 
+const rawBackendUrls = process.env.BACKEND_URL
+  ? process.env.BACKEND_URL.split(',').map((url) => url.trim().replace(/\/+$/, '')).filter(Boolean)
+  : [];
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
-  ...rawClientUrls
+  'http://localhost:5000',
+  'http://127.0.0.1:5000',
+  `http://localhost:${PORT}`,
+  `http://127.0.0.1:${PORT}`,
+  ...rawClientUrls,
+  ...rawBackendUrls
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. mobile apps, curl, health checks)
-    if (!origin) return callback(null, true);
-    const normalizedOrigin = origin.replace(/\/+$/, '');
-    if (allowedOrigins.includes(normalizedOrigin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS policy: Origin ${origin} not allowed.`));
-  },
-  credentials: true
+app.use(cors((req, callback) => {
+  const origin = req.headers.origin;
+  // Allow requests with no origin (e.g. mobile apps, curl, health checks, direct browser navigation)
+  if (!origin) {
+    return callback(null, { origin: true, credentials: true });
+  }
+
+  const normalizedOrigin = origin.replace(/\/+$/, '');
+  const host = req.headers.host;
+  const isSameHost = Boolean(host && (
+    normalizedOrigin === `http://${host}` ||
+    normalizedOrigin === `https://${host}`
+  ));
+
+  if (allowedOrigins.includes(normalizedOrigin) || isSameHost) {
+    return callback(null, { origin: true, credentials: true });
+  }
+
+  return callback(new Error(`CORS policy: Origin ${origin} not allowed.`));
 }));
 
 app.use(express.json());

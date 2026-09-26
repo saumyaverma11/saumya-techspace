@@ -531,8 +531,17 @@ export const portfolioService = {
   },
 
   /**
+   * Check status of a resume request using tracking token (public endpoint)
+   * @param {string} token - Raw tracking token held by visitor
+   */
+  async getResumeRequestStatus(token) {
+    const res = await api.get(`/resume-requests/status/${token}`);
+    return res;
+  },
+
+  /**
    * Validate a download token and get the resume URL (public endpoint)
-   * @param {string} token - Raw approval token from email link
+   * @param {string} token - Raw approval token from email link or tracking token
    */
   async validateDownloadToken(token) {
     const res = await api.get(`/resume-requests/download/${token}`);

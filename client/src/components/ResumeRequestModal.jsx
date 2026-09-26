@@ -10,9 +10,21 @@ function ResumeRequestModal({ isOpen, onClose }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [downloadUrl, setDownloadUrl] = useState(null);
+  const [isAutoApproved, setIsAutoApproved] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const firstInputRef = useRef(null);
 
-  // Focus first input on open
+  // Clean up any old tracking tokens from localStorage
+  useEffect(() => {
+    try {
+      localStorage.removeItem('saumya_resume_tracking_token');
+    } catch {
+      // ignore storage access errors
+    }
+  }, []);
+
+  // Reset form and focus on open
   useEffect(() => {
     if (isOpen) {
       setForm({ name: '', email: '', message: '' });
@@ -20,6 +32,9 @@ function ResumeRequestModal({ isOpen, onClose }) {
       setSubmitting(false);
       setSubmitted(false);
       setSubmitError(null);
+      setDownloadUrl(null);
+      setIsAutoApproved(false);
+      setDownloading(false);
       setTimeout(() => firstInputRef.current?.focus(), 80);
     }
   }, [isOpen]);
@@ -53,6 +68,34 @@ function ResumeRequestModal({ isOpen, onClose }) {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
+  const triggerDownload = async (url) => {
+    if (!url) return;
+    setDownloading(true);
+    try {
+      analyticsService.trackResumeDownloadCompleted();
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      const arrayBuffer = await response.arrayBuffer();
+      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'Saumya_Verma_Resume.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1500);
+    } catch {
+      // Fallback: window.open
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
@@ -72,11 +115,23 @@ function ResumeRequestModal({ isOpen, onClose }) {
         sessionId: analyticsService.getSessionId()
       });
 
-      // ANALYTICS_HOOK: resume_download_request (Phase 27 — NO PII in analytics)
+      // Track request in analytics without PII
       const requestId = res?.data?._id;
       analyticsService.trackResumeDownloadRequest(requestId);
 
       setSubmitted(true);
+
+      // In Production: autoApproved will be true and resumeUrl will be provided
+      if (res?.autoApproved && res?.resumeUrl) {
+        setIsAutoApproved(true);
+        setDownloadUrl(res.resumeUrl);
+        // Automatically start the download
+        setTimeout(() => {
+          triggerDownload(res.resumeUrl);
+        }, 300);
+      } else {
+        setIsAutoApproved(false);
+      }
     } catch (err) {
       setSubmitError(err.message || 'Failed to submit request. Please try again.');
     } finally {
@@ -113,7 +168,7 @@ function ResumeRequestModal({ isOpen, onClose }) {
                 Resume Download Request
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Request will be reviewed and you'll be emailed.
+                Provide your details to receive access to the resume.
               </p>
             </div>
           </div>
@@ -133,8 +188,8 @@ function ResumeRequestModal({ isOpen, onClose }) {
 
         {/* Body */}
         <div className="px-6 py-5">
-          {/* Success State */}
           {submitted ? (
+            /* Success State */
             <div className="flex flex-col items-center py-6 text-center">
               <span className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-400/10">
                 <svg className="h-8 w-8 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,17 +197,59 @@ function ResumeRequestModal({ isOpen, onClose }) {
                 </svg>
               </span>
               <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
-                Request Submitted!
+                Request Submitted Successfully!
               </h3>
-              <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Your request has been submitted successfully. You will receive an email at{' '}
-                <strong className="text-blue-600 dark:text-cyan-400">{form.email}</strong>{' '}
-                after it is reviewed.
-              </p>
+
+              {isAutoApproved ? (
+                <>
+                  <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Your request has been submitted successfully.
+                  </p>
+                  <div className="mt-4 w-full rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-xs leading-relaxed text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300">
+                    Your resume download will start shortly.
+                  </div>
+
+                  {downloadUrl && (
+                    <button
+                      type="button"
+                      onClick={() => triggerDownload(downloadUrl)}
+                      disabled={downloading}
+                      className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-500 disabled:opacity-50"
+                    >
+                      {downloading ? (
+                        <>
+                          <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Downloading...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          Download Resume Now
+                        </>
+                      )}
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Your request has been submitted and will be reviewed.
+                  </p>
+                  <div className="mt-4 w-full rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs leading-relaxed text-blue-700 dark:border-cyan-400/20 dark:bg-cyan-400/10 dark:text-cyan-300">
+                    The download link will be provided after approval.
+                  </div>
+                </>
+              )}
+
               <button
                 type="button"
                 onClick={onClose}
-                className="mt-6 rounded-full bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 dark:bg-cyan-400 dark:text-slate-950 dark:hover:bg-cyan-300"
+                className="mt-6 rounded-full bg-slate-100 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
               >
                 Close
               </button>
@@ -223,13 +320,13 @@ function ResumeRequestModal({ isOpen, onClose }) {
                 )}
               </div>
 
-              {/* Message */}
+              {/* Message / Reason */}
               <div className="mb-6">
                 <label
                   htmlFor="resume-req-message"
                   className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
-                  Message{' '}
+                  Reason / Message{' '}
                   <span className="font-normal text-slate-400">(optional)</span>
                 </label>
                 <textarea

@@ -32,6 +32,11 @@ export function useAnalytics() {
   useEffect(() => {
     const currentPath = location.pathname;
 
+    // Exclude internal admin console routes from public telemetry
+    if (currentPath.startsWith('/admin')) {
+      return;
+    }
+
     // Avoid duplicate page_view events on component re-renders for the same route
     if (lastTrackedPathRef.current !== currentPath) {
       lastTrackedPathRef.current = currentPath;

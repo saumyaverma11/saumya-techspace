@@ -338,7 +338,7 @@ export const renderInteractiveConfirmation = ({
   const actionBtnColor = isApprove ? '#059669' : '#dc2626';
   const actionBtnHover = isApprove ? '#047857' : '#b91c1c';
   const buttonLabel = isApprove ? 'Confirm Approval' : 'Confirm Rejection';
-  const formAction = `/api/resume-requests/email-action/${action}`;
+  const formAction = `/api/resume-requests/email-action/${action}?token=${encodeURIComponent(token)}`;
 
   const iconSvg = isApprove
     ? `<svg style="width: 48px; height: 48px; color: #10b981;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -479,8 +479,8 @@ export const renderInteractiveConfirmation = ({
     <h1>${title}</h1>
     <p class="desc">
       ${isApprove
-        ? 'Please confirm that you want to approve this resume download request. The requester will receive an authorized download link.'
-        : 'Please confirm that you want to reject this resume download request. The requester will be notified.'}
+        ? 'Please confirm that you want to approve this resume download request. A secure authorized download link will be generated.'
+        : 'Please confirm that you want to reject this resume download request.'}
     </p>
 
     <div class="info-box">

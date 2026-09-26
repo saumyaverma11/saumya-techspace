@@ -620,7 +620,7 @@ function ResumePage() {
                   Want a copy of this resume?
                 </h3>
                 <p className={`mt-0.5 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Submit a download request and you'll receive a secure link via email after review.
+                  Submit a download request to get access. Your resume download will start shortly after submitting.
                 </p>
               </div>
               <button

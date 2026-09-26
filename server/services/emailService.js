@@ -3,17 +3,24 @@ import nodemailer from 'nodemailer';
 // Helper function to create Nodemailer transporter for Gmail SMTP
 const getTransporter = () => {
   return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // SSL/TLS on port 465
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD
     },
-    connectionTimeout: 10000, // 10s connection timeout
-    greetingTimeout: 10000,
+    connectionTimeout: 10000,
     socketTimeout: 15000
   });
+};
+
+// Helper to determine if Resend HTTPS API should be used
+// Strictly used in production (NODE_ENV=production) or when explicitly forced (USE_RESEND=true)
+// Localhost development continues using the existing Gmail SMTP/Nodemailer configuration
+const shouldUseResend = () => {
+  if (!process.env.RESEND_API_KEY) {
+    return false;
+  }
+  return process.env.NODE_ENV === 'production' || process.env.USE_RESEND === 'true';
 };
 
 export const sendContactEmail = async ({ name, email, subject, message }) => {
@@ -49,8 +56,8 @@ export const sendContactEmail = async ({ name, email, subject, message }) => {
     </div>
   `;
 
-  // Production: If RESEND_API_KEY is configured, dispatch via Resend HTTPS API (bypasses Render SMTP port blocking)
-  if (process.env.RESEND_API_KEY) {
+  // Production: If Resend is configured for production, dispatch via Resend HTTPS API (bypasses Render SMTP port blocking)
+  if (shouldUseResend()) {
     const toAddress = (process.env.CONTACT_RECEIVER || process.env.EMAIL_USER || '').trim();
     if (!toAddress) {
       console.warn('Neither CONTACT_RECEIVER nor EMAIL_USER is configured. Skipping email dispatch.');
@@ -159,7 +166,8 @@ export const sendResumeRequestNotification = async ({
   message,
   requestedAt,
   rawApproveToken,
-  rawRejectToken
+  rawRejectToken,
+  autoApproved = false
 }) => {
   const formattedDate = new Date(requestedAt).toLocaleString('en-US', {
     dateStyle: 'full',
@@ -176,7 +184,32 @@ export const sendResumeRequestNotification = async ({
     : `${clientUrl}/admin/resume-requests`;
   const adminDashboardUrl = `${clientUrl}/admin/resume-requests`;
 
-  const textContent = `New Resume Download Request\n\nName: ${visitorName}\nEmail: ${visitorEmail}\n${message ? `Message: ${message}\n` : ''}Request ID: ${requestId}\nRequested At: ${formattedDate}\nStatus: Pending\n\nActions:\n[ APPROVE REQUEST ]:\n${approveUrl}\n\n[ REJECT REQUEST ]:\n${rejectUrl}\n\nOr review this request in the Admin Panel:\n${adminDashboardUrl}\n\nSaumya TechSpace Portfolio`;
+  const statusLabel = autoApproved ? 'Downloaded (Direct Access)' : 'Pending';
+
+  const textContent = autoApproved
+    ? `New Resume Download Request\n\nName: ${visitorName}\nEmail: ${visitorEmail}\n${message ? `Message: ${message}\n` : ''}Request ID: ${requestId}\nRequested At: ${formattedDate}\nStatus: ${statusLabel}\n\nNotice: Direct access was granted to the visitor in production.\nReview in Admin Panel:\n${adminDashboardUrl}\n\nSaumya TechSpace Portfolio`
+    : `New Resume Download Request\n\nName: ${visitorName}\nEmail: ${visitorEmail}\n${message ? `Message: ${message}\n` : ''}Request ID: ${requestId}\nRequested At: ${formattedDate}\nStatus: ${statusLabel}\n\nActions:\n[ APPROVE REQUEST ]:\n${approveUrl}\n\n[ REJECT REQUEST ]:\n${rejectUrl}\n\nOr review this request in the Admin Panel:\n${adminDashboardUrl}\n\nSaumya TechSpace Portfolio`;
+
+  const actionBlockHtml = autoApproved
+    ? `
+      <div style="margin-bottom: 20px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 18px; text-align: center;">
+        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold; color: #15803d;">Direct Access Granted (Production):</p>
+        <p style="margin: 0 0 14px 0; font-size: 13px; color: #475569;">The visitor submitted the request form and the resume was delivered immediately.</p>
+        <a href="${adminDashboardUrl}" style="background-color: #06b6d4; color: #0f172a; padding: 10px 22px; font-weight: bold; font-size: 13px; border-radius: 8px; text-decoration: none; display: inline-block;">Open Admin Panel</a>
+      </div>
+    `
+    : `
+      <div style="margin-bottom: 20px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; text-align: center;">
+        <p style="margin: 0 0 14px 0; font-size: 14px; font-weight: bold; color: #0f172a;">Quick Actions (Direct from Email):</p>
+        <div style="margin-bottom: 14px;">
+          <a href="${approveUrl}" style="background-color: #059669; color: #ffffff; padding: 12px 24px; font-weight: bold; font-size: 14px; border-radius: 8px; text-decoration: none; display: inline-block; margin-right: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">APPROVE REQUEST</a>
+          <a href="${rejectUrl}" style="background-color: #dc2626; color: #ffffff; padding: 12px 24px; font-weight: bold; font-size: 14px; border-radius: 8px; text-decoration: none; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">REJECT REQUEST</a>
+        </div>
+        <p style="margin: 8px 0 0 0; font-size: 13px; color: #64748b;">
+          Or review this request in the <a href="${adminDashboardUrl}" style="color: #0284c7; text-decoration: underline; font-weight: 500;">Admin Panel</a>.
+        </p>
+      </div>
+    `;
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #1e293b;">
@@ -189,19 +222,11 @@ export const sendResumeRequestNotification = async ({
         <p style="margin: 0 0 8px 0; font-size: 15px;"><strong>Name:</strong> ${visitorName}</p>
         <p style="margin: 0 0 8px 0; font-size: 15px;"><strong>Email:</strong> <a href="mailto:${visitorEmail}" style="color: #0284c7; text-decoration: none;">${visitorEmail}</a></p>
         ${message ? `<p style="margin: 0 0 8px 0; font-size: 15px;"><strong>Message:</strong> ${message}</p>` : ''}
-        <p style="margin: 0; font-size: 13px; color: #64748b;"><strong>Request ID:</strong> ${requestId}</p>
+        <p style="margin: 0 0 8px 0; font-size: 13px; color: #64748b;"><strong>Request ID:</strong> ${requestId}</p>
+        <p style="margin: 0; font-size: 13px; color: #64748b;"><strong>Status:</strong> <span style="font-weight: 600; color: ${autoApproved ? '#15803d' : '#d97706'};">${statusLabel}</span></p>
       </div>
 
-      <div style="margin-bottom: 20px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; text-align: center;">
-        <p style="margin: 0 0 14px 0; font-size: 14px; font-weight: bold; color: #0f172a;">Quick Actions (Direct from Email):</p>
-        <div style="margin-bottom: 14px;">
-          <a href="${approveUrl}" style="background-color: #059669; color: #ffffff; padding: 12px 24px; font-weight: bold; font-size: 14px; border-radius: 8px; text-decoration: none; display: inline-block; margin-right: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">APPROVE REQUEST</a>
-          <a href="${rejectUrl}" style="background-color: #dc2626; color: #ffffff; padding: 12px 24px; font-weight: bold; font-size: 14px; border-radius: 8px; text-decoration: none; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">REJECT REQUEST</a>
-        </div>
-        <p style="margin: 8px 0 0 0; font-size: 13px; color: #64748b;">
-          Or review this request in the <a href="${adminDashboardUrl}" style="color: #0284c7; text-decoration: underline; font-weight: 500;">Admin Panel</a>.
-        </p>
-      </div>
+      ${actionBlockHtml}
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 13px; color: #94a3b8;">
         <p style="margin: 0 0 4px 0;"><strong>Requested At:</strong> ${formattedDate}</p>
@@ -210,8 +235,8 @@ export const sendResumeRequestNotification = async ({
     </div>
   `;
 
-  // Production: If RESEND_API_KEY is configured, dispatch via Resend HTTPS API (bypasses Render SMTP port blocking)
-  if (process.env.RESEND_API_KEY) {
+  // Production: If Resend is configured for production, dispatch via Resend HTTPS API (bypasses Render SMTP port blocking)
+  if (shouldUseResend()) {
     const toAddress = (process.env.CONTACT_RECEIVER || process.env.EMAIL_USER || '').trim();
     if (!toAddress) {
       console.warn('Neither CONTACT_RECEIVER nor EMAIL_USER is configured. Skipping resume request notification.');
@@ -298,8 +323,8 @@ export const sendResumeApprovalEmail = async ({
     </div>
   `;
 
-  // Production: Try Resend HTTPS if key is configured
-  if (process.env.RESEND_API_KEY) {
+  // Production: Try Resend HTTPS if configured for production
+  if (shouldUseResend()) {
     try {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -377,8 +402,8 @@ export const sendResumeRejectionEmail = async ({
     </div>
   `;
 
-  // Production: Try Resend HTTPS if key is configured
-  if (process.env.RESEND_API_KEY) {
+  // Production: Try Resend HTTPS if configured for production
+  if (shouldUseResend()) {
     try {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',

@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import mongoose from 'mongoose';
 import ResumeDownloadRequest from '../models/ResumeDownloadRequest.js';
 import Profile from '../models/Profile.js';
+import AnalyticsEvent from '../models/AnalyticsEvent.js';
 import {
   sendResumeRequestNotification
 } from '../services/emailService.js';
@@ -59,7 +60,76 @@ export const createRequest = async (req, res) => {
       });
     }
 
-    // Generate cryptographically secure tokens for email action
+    // Strict Environment Isolation:
+    // Production automatically approves the request, dispatches Resend notification, and returns resumeUrl for immediate download.
+    // Localhost strictly preserves the manual approval workflow with Gmail SMTP.
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      const profile = await Profile.findOne({}).select('resumeUrl');
+      const resumeUrl = profile?.resumeUrl || null;
+
+      const savedRequest = await ResumeDownloadRequest.create({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        message: message ? message.trim() : '',
+        sessionId: (sessionId && typeof sessionId === 'string') ? sessionId.trim().slice(0, 128) : null,
+        status: 'approved',
+        requestedAt: new Date(),
+        reviewedAt: new Date(),
+        reviewedBy: 'system_auto_approve',
+        reviewSource: null
+      });
+
+      // Record resume_download_approved event so the Resume Funnel accurately reflects auto-approvals in production
+      if (savedRequest.sessionId) {
+        try {
+          await AnalyticsEvent.create({
+            sessionId: savedRequest.sessionId,
+            eventType: 'resume_download_approved',
+            page: '/resume',
+            section: 'resume',
+            metadata: {
+              requestId: savedRequest._id.toString(),
+              source: 'production_auto_approve'
+            }
+          });
+        } catch (analyticsErr) {
+          console.warn('Resume download auto-approval analytics notice:', analyticsErr.message);
+        }
+      }
+
+      // Send notification email to admin via Resend HTTPS API — non-blocking
+      try {
+        await sendResumeRequestNotification({
+          requestId: savedRequest._id.toString(),
+          visitorName: savedRequest.name,
+          visitorEmail: savedRequest.email,
+          message: savedRequest.message,
+          requestedAt: savedRequest.requestedAt,
+          autoApproved: true
+        });
+      } catch (emailError) {
+        console.error(
+          'Resume request notification email failed (request still saved):',
+          emailError.message
+        );
+      }
+
+      return res.status(201).json({
+        success: true,
+        autoApproved: true,
+        resumeUrl,
+        message: 'Your request has been submitted successfully. Your resume download will start shortly.',
+        data: {
+          _id: savedRequest._id,
+          status: 'approved',
+          requestedAt: savedRequest.requestedAt
+        }
+      });
+    }
+
+    // LOCALHOST FLOW: Keep existing manual approval workflow and Gmail SMTP completely unchanged
     const rawApproveToken = crypto.randomBytes(32).toString('hex');
     const rawRejectToken = crypto.randomBytes(32).toString('hex');
 
@@ -88,7 +158,7 @@ export const createRequest = async (req, res) => {
       emailActionTokenExpire: emailActionTokenExpire
     });
 
-    // Send notification email to admin with raw action tokens — non-blocking
+    // Send notification email to admin with raw action tokens via Gmail SMTP on localhost
     try {
       await sendResumeRequestNotification({
         requestId: savedRequest._id.toString(),
@@ -108,8 +178,9 @@ export const createRequest = async (req, res) => {
 
     return res.status(201).json({
       success: true,
+      autoApproved: false,
       message:
-        'Your request has been submitted. You will receive an email after it is reviewed.',
+        'Your request has been submitted and will be reviewed. The download link will be provided after approval.',
       data: {
         _id: savedRequest._id,
         status: savedRequest.status,
@@ -524,6 +595,73 @@ export const emailActionRejectConfirm = async (req, res) => {
   }
 };
 
+// Public: Visitor checks their resume request status via trackingToken
+export const getRequestStatus = async (req, res) => {
+  try {
+    const token = req.params.token || req.query.token;
+
+    if (!token || typeof token !== 'string' || token.length < 20) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or missing tracking token.'
+      });
+    }
+
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    const request = await ResumeDownloadRequest.findOne({
+      trackingToken: hashedToken
+    }).select('+trackingToken');
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume request not found or invalid token.'
+      });
+    }
+
+    // Check expiration
+    const isExpired = request.status === 'approved'
+      ? (request.approvalTokenExpire && request.approvalTokenExpire < new Date())
+      : (request.emailActionTokenExpire && request.emailActionTokenExpire < new Date());
+
+    if (isExpired) {
+      return res.status(200).json({
+        success: true,
+        status: 'expired',
+        message: 'Your resume request link has expired. Please submit a new request.',
+        requestedAt: request.requestedAt
+      });
+    }
+
+    // Prepare safe public response without exposing PII, visitor email, or admin tokens
+    const responseData = {
+      success: true,
+      status: request.status,
+      requestedAt: request.requestedAt,
+      reviewedAt: request.reviewedAt || null
+    };
+
+    if (request.status === 'approved') {
+      responseData.approvalTokenExpire = request.approvalTokenExpire;
+      responseData.canDownload = true;
+    } else if (request.status === 'rejected') {
+      responseData.rejectionNote = request.rejectionNote || null;
+    }
+
+    return res.status(200).json(responseData);
+  } catch (error) {
+    console.error('getRequestStatus error:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve request status.'
+    });
+  }
+};
+
 // ANALYTICS_HOOK: resume_download_completed (Phase 27 can track here)
 export const downloadResume = async (req, res) => {
   try {
@@ -542,10 +680,13 @@ export const downloadResume = async (req, res) => {
       .update(token)
       .digest('hex');
 
-    // Find request with matching token hash
+    // Find request with matching approvalToken OR trackingToken
     const request = await ResumeDownloadRequest.findOne({
-      approvalToken: hashedToken
-    });
+      $or: [
+        { approvalToken: hashedToken },
+        { trackingToken: hashedToken }
+      ]
+    }).select('+trackingToken');
 
     if (!request) {
       return res.status(404).json({

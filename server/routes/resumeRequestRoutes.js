@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createRequest,
+  getRequestStatus,
   getRequests,
   getRequestById,
   approveRequest,
@@ -17,6 +18,9 @@ const router = express.Router();
 
 // Public: submit a resume download request
 router.post('/', createRequest);
+
+// Public: check resume request status via tracking token
+router.get('/status/:token?', getRequestStatus);
 
 // Public: validate download token and get resume URL (token validated server-side)
 router.get('/download/:token', downloadResume);

@@ -325,6 +325,10 @@ export const getDashboardSummary = async (req, res) => {
     const uniqueSessions = uniqueSessionsResult[0]?.count || 0;
     const avgEventsPerSession =
       uniqueSessions > 0 ? parseFloat((totalEvents / uniqueSessions).toFixed(1)) : 0;
+    const contactStarts = eventMap['contact_form_start'] || 0;
+    const contactSubmissions = eventMap['contact_form_submit'] || 0;
+    const contactConversionRate =
+      contactStarts > 0 ? parseFloat(((contactSubmissions / contactStarts) * 100).toFixed(1)) : 0;
 
     const rangeName = req.query.from && req.query.to ? 'custom' : req.query.range || '7d';
 
@@ -344,8 +348,9 @@ export const getDashboardSummary = async (req, res) => {
         resumeApprovals: eventMap['resume_download_approved'] || 0,
         authorizedDownloadActions: eventMap['resume_download_completed'] || 0,
         authorizedDownloads: eventMap['resume_download_completed'] || 0,
-        contactStarts: eventMap['contact_form_start'] || 0,
-        contactSubmissions: eventMap['contact_form_submit'] || 0,
+        contactStarts,
+        contactSubmissions,
+        contactConversionRate,
         githubClicks: (eventMap['github_click'] || 0) + (eventMap['project_github_click'] || 0),
         linkedinClicks: eventMap['linkedin_click'] || 0,
         emailClicks: eventMap['email_click'] || 0,
